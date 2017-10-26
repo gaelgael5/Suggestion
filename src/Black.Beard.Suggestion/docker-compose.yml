@@ -1,0 +1,8 @@
+version: '3'
+
+services:
+  suggestion:
+    image: suggestion
+    build:
+      context: ./Suggestion
+      dockerfile: Dockerfile

@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <RootNamespace>Bb</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Sdk\ComponentModel\MethodDiscovery.cs" />
+    <Compile Remove="Sdk\Serializer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Black.Beard.Suggestion.Models\Black.Beard.Suggestion.Models.csproj" />
+  </ItemGroup>
+
+</Project>
