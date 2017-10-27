@@ -1,15 +1,14 @@
 ﻿using Bb.Sdk.Expressions;
-using Bb.Sdk.Factories;
-using Bb.Sdk.Helpers;
 using Bb.Suggestion.Models;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
 namespace Bb.Suggestion.Service
 {
 
-    internal class RuleInfo
+    public class RuleInfo
     {
 
         static RuleInfo()
@@ -25,6 +24,7 @@ namespace Bb.Suggestion.Service
             this.factory = factory;
             this.Parameters = ctor.GetParameters();
             this.HashParameters = Comparer.GetHashCode(this.Parameters.Select(c => c.ParameterType).ToArray());
+            this.Method = type.GetMethod("IsSatisfiedBy");
         }
 
         public readonly Type Type;
@@ -37,20 +37,7 @@ namespace Bb.Suggestion.Service
         protected readonly object factory;
 
         public int HashParameters { get; }
-
+        public MethodInfo Method { get; private set; }
     }
-
-    internal class RuleInfo<TEntities> : RuleInfo
-        where TEntities : ISuggerableModel
-    {
-
-        public RuleInfo(string name, Type type, ConstructorInfo ctor) : base(name, type, ctor, ObjectCreator.GetActivator<ISpecification<TEntities>>(ctor))
-        {
-            
-        }
-
-        public ObjectActivator<ISpecification<TEntities>> Factory {  get { return base.factory as ObjectActivator<ISpecification<TEntities>>; } }
-
-    }
-
+    
 }

@@ -3,17 +3,21 @@ version 1.0
 */
 grammar Suggestion;
 
-DIGIT: [0-9];
 AND: '&';
 ANDALSO: '&&';
 OR: '|';
 XOR: '||';
 NOT: '!';
+
+K_ALL: 'ALL';
 K_NULL: 'NULL';
+K_TRUE: 'TRUE';
+K_FALSE: 'FALSE';
 K_CURRENT_TIME: 'CURRENT_TIME';
 K_CURRENT_DATE: 'CURRENT_DATE';
 K_CURRENT_TIMESTAMP: 'CURRENT_TIMESTAMP';
 
+DIGIT: [0-9];
 IDENTIFIER
     : '"' (~'"' | '""')* '"'
     | '`' (~'`' | '``')* '`'
@@ -25,33 +29,41 @@ IDENTIFIER
  ################## LEXER RULES ################## 
  */
 
-sql_stmt_list
-    : ';'* sql_stmt ( ';'+ sql_stmt )* ';'*
+stmt_list
+    : ';'* stmt_line ( ';'+ stmt_line )* ';'*
  ;
 
-sql_stmt
+stmt_line
     : select_stmt
 ;
 
 select_stmt
-    : where_stmt
+    : where_stmt order_stmt? facet_stmt?
 ;
 
 where_stmt
-    : 'WHERE' + expr
+    : 'WHERE' (expr | K_ALL)
 ;
 
-expr
-    : literal_value
-    | '(' expr ')'
-    | unary_operator expr
-    | expr binary_operator expr
-    | function_name '(' ( expr ( ',' expr )* )? ')'
- ;
+order_stmt
+    : 'ORDER BY' identifier_stmt
+;
 
-numeric_literal
-    : '-'? DIGIT+ ( '.' DIGIT* )?
- ;
+facet_stmt
+    : 'WITH FACETS' IDENTIFIER ( ',' IDENTIFIER )*
+;
+
+function_stmt
+    : function_name '(' function_args_stmt? ')'
+;
+
+function_args_stmt
+    : expr ( ',' expr )*
+;
+
+identifier_stmt
+    : IDENTIFIER ('.' IDENTIFIER)*
+;
 
 bind_parameter
  : (':') IDENTIFIER
@@ -59,6 +71,19 @@ bind_parameter
 
 string_literal
  : '\'' ( ~'\'' | '\'\'' )* '\''
+ ;
+
+numeric_literal
+    : numeric_double_literal
+    | numeric_integer_literal
+ ;
+
+numeric_integer_literal
+    : '-'? DIGIT+
+ ;
+
+numeric_double_literal
+    : '-'? DIGIT + '.' DIGIT+
  ;
 
  function_name
@@ -73,16 +98,44 @@ binary_operator
     : AND | OR | ANDALSO | XOR
 ;
 
+numeric_binary_operator
+    : '+' | '-' | '/'  | '*'  | '^' | '%'
+;
+
+boolean_binary_operator
+    : '<' | '>' | '=' | '<=' | '>=' | '<<' | '>>'
+;
+
 unary_operator 
     : NOT
 ;
 
-literal_value
-    : numeric_literal
+expr
+    : numeric_literal_expr
+    | string_literal_expr
+    | constant_literal_value
     | bind_parameter
-    | string_literal
-    | 'null'
-    // | K_CURRENT_TIME
-    // | K_CURRENT_DATE
-    // | K_CURRENT_TIMESTAMP
+    | '(' expr ')'
+    | unary_operator expr
+    | expr binary_operator expr
+    | function_stmt
+ ;
+
+numeric_literal_expr
+    : numeric_literal
+    | numeric_literal numeric_binary_operator numeric_literal
+;
+
+string_literal_expr
+    : string_literal
+    | string_literal ( '+' string_literal )?
+;
+
+constant_literal_value
+    : K_NULL
+    | K_CURRENT_TIME
+    | K_CURRENT_DATE
+    | K_CURRENT_TIMESTAMP
+    | K_TRUE
+    | K_FALSE
  ;

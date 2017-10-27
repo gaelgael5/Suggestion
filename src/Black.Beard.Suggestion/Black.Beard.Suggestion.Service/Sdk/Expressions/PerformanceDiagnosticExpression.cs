@@ -5,7 +5,7 @@ using System.Text;
 namespace Bb.Sdk.Expressions
 {
 
-    public class DiagnosticExpression
+    public class PerformanceDiagnosticExpression
     {
 
         //static DiagnosticExpression()
@@ -13,7 +13,7 @@ namespace Bb.Sdk.Expressions
         //    DiagnosticExpression._instance = new Lazy<DiagnosticExpression>();
         //}
 
-        public DiagnosticExpression()
+        public PerformanceDiagnosticExpression()
         {
             this._dic = new Dictionary<int, Diagnostic>();
         }

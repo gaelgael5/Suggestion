@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 
 namespace Bb.Suggestion.Service
 {
-    internal class ArrayTypeEqulityComparer : System.Collections.Generic.IEqualityComparer<Type[]>
+    public class ArrayTypeEqulityComparer : System.Collections.Generic.IEqualityComparer<Type[]>
     {
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

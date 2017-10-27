@@ -11,7 +11,7 @@ using System.Reflection;
 namespace Bb.Suggestion.Service
 {
 
-    public class RuleRepository<TEntities>
+    public class RuleRepository<TEntities> : IRuleRepository
         where TEntities : ISuggerableModel
     {
 
@@ -29,12 +29,12 @@ namespace Bb.Suggestion.Service
         /// </summary>
         /// <param name="diagnostics">The diagnostics.</param>
         /// <param name="pluginsPaths">The plugins paths that contains types.</param>
-        public RuleRepository(DiagnosticExpression diagnostics, params string[] pluginsPaths)
+        public RuleRepository(PerformanceDiagnosticExpression diagnostics, params string[] pluginsPaths)
         {
             this.comparer = new RuleInfoEqualityComparer();
             this._rules = new HashSet<RuleInfo<TEntities>>(1000, this.comparer);
             this.typeRepository = new TypeDiscovery(pluginsPaths);
-            this.diagnostics = diagnostics ?? new DiagnosticExpression();
+            this.diagnostics = diagnostics ?? new PerformanceDiagnosticExpression();
         }
 
         /// <summary>
@@ -89,7 +89,7 @@ namespace Bb.Suggestion.Service
 
         }
 
-        internal ObjectActivator<ISpecification<TEntities>> Resolve(string name, Type[] types)
+        public RuleInfo<TEntities> Resolve(string name, Type[] types)
         {
 
             if (this._lookup == null)
@@ -131,16 +131,16 @@ namespace Bb.Suggestion.Service
 
             var result = items2[0];
 
-            return result.Factory;
+            return result;
 
         }
 
-        public DiagnosticExpression Diagnostic { get { return this.diagnostics; } }
+        public PerformanceDiagnosticExpression Diagnostic { get { return this.diagnostics; } }
 
         private readonly RuleInfoEqualityComparer comparer;
         private readonly HashSet<RuleInfo<TEntities>> _rules;
         private TypeDiscovery typeRepository;
-        private readonly DiagnosticExpression diagnostics;
+        private readonly PerformanceDiagnosticExpression diagnostics;
         private ILookup<string, RuleInfo<TEntities>> _lookup;
     }
 

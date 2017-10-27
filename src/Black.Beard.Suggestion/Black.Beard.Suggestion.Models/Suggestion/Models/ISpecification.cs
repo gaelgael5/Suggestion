@@ -28,7 +28,7 @@ namespace Bb.Sdk.Expressions
         /// <returns></returns>
         bool IsSatisfiedBy(TEntity entity);
 
-        void Initialize<TEntities>(SpecificationFactory<TEntities> specificationFactory) where TEntities : ISuggerableModel;
+        void Initialize<TEntities>(ISpecificationFactory<TEntities> specificationFactory) where TEntities : ISuggerableModel;
 
     }
 

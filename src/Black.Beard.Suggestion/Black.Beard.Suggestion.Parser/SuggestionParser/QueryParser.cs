@@ -8,14 +8,15 @@ using System.Text;
 namespace Bb.Suggestion.SuggestionParser
 {
 
-    public class QueryParser
+    public class QueryParser<TEntities>
+        where TEntities : ISuggerableModel
     {
 
         public List<Exception> Exceptions { get; }
 
-        public QueryParser()
+        public QueryParser(QueryContext<TEntities> context)
         {
-
+            this._context = context;
             //var grammar = new SuggestionGrammar();
             //this.parser = new Parser(grammar);
             this.Exceptions = new List<Exception>();
@@ -37,25 +38,33 @@ namespace Bb.Suggestion.SuggestionParser
                 var lexer = new SuggestionLexer(stream);
                 var token = new CommonTokenStream(lexer);
                 var parser = new SuggestionParser(token) { BuildParseTree = true };
-                var context = parser.sql_stmt();
-
+                var context = parser.stmt_list();
+                
                 foreach (IParseTree ast in context.children)
                 {
 
-                    switch (ast)
-                    {
+                    SelectVisitor<TEntities> visitor = new SelectVisitor<TEntities>(this._context);
+                    visitor.Visit(ast);
+                    result = visitor.Result;
 
-                        case Bb.Suggestion.SuggestionParser.SuggestionParser.Select_stmtContext stmtContext:
-                            SelectVisitor visitor = new SelectVisitor();
-                            visitor.Visit(ast);
-                            result = visitor.Result;
-                            break;
+                    //switch (ast)
+                    //{
 
-                        default:
-                            if (System.Diagnostics.Debugger.IsAttached)
-                                System.Diagnostics.Debugger.Break();
-                            break;
-                    }
+                    //    case Bb.Suggestion.SuggestionParser.SuggestionParser.Sql_stmt_listContext stmtContext:
+
+                    //        break;
+
+                    //    case Bb.Suggestion.SuggestionParser.SuggestionParser.Select_stmtContext stmtContext:
+                    //        SelectVisitor visitor = new SelectVisitor();
+                    //        visitor.Visit(ast);
+                    //        result = visitor.Result;
+                    //        break;
+
+                    //    default:
+                    //        if (System.Diagnostics.Debugger.IsAttached)
+                    //            System.Diagnostics.Debugger.Break();
+                    //        break;
+                    //}
 
                 }
 
@@ -73,6 +82,10 @@ namespace Bb.Suggestion.SuggestionParser
             return result;
    
         }
+
+
+
+        private readonly QueryContext<TEntities> _context;
 
     }
 

@@ -97,7 +97,7 @@ namespace Black.Beard.Suggestion.UnitTests
         public void EvaluateDiscoveryResolverAndActivateWithDiagnostic()
         {
 
-            DiagnosticExpression diag = new DiagnosticExpression() { DiagnosticMode = true };
+            PerformanceDiagnosticExpression diag = new PerformanceDiagnosticExpression() { DiagnosticMode = true };
             RuleRepository<Site> repository = new RuleRepository<Site>(diag);
             SpecificationFactory<Site> _factory = new SpecificationFactory<Site>(repository);
             var a = repository.ResolveType(typeof(RuleSuggerable).Assembly);
@@ -121,7 +121,7 @@ namespace Black.Beard.Suggestion.UnitTests
         public void EvaluateDiscoveryResolverAndActivateWithDiagnosticAverage()
         {
 
-            DiagnosticExpression diag = new DiagnosticExpression() { DiagnosticMode = true };
+            PerformanceDiagnosticExpression diag = new PerformanceDiagnosticExpression() { DiagnosticMode = true };
             RuleRepository<Site> repository = new RuleRepository<Site>(diag);
             SpecificationFactory<Site> _factory = new SpecificationFactory<Site>(repository);
             var a = repository.ResolveType(typeof(RuleSuggerable).Assembly);
@@ -145,7 +145,7 @@ namespace Black.Beard.Suggestion.UnitTests
         public void EvaluateDiscoveryResolverAndActivateWithDiagnosticPercentile()
         {
 
-            DiagnosticExpression diag = new DiagnosticExpression() { DiagnosticMode = true };
+            PerformanceDiagnosticExpression diag = new PerformanceDiagnosticExpression() { DiagnosticMode = true };
             RuleRepository<Site> repository = new RuleRepository<Site>(diag);
             SpecificationFactory<Site> _factory = new SpecificationFactory<Site>(repository);
             var a = repository.ResolveType(typeof(RuleSuggerable).Assembly);

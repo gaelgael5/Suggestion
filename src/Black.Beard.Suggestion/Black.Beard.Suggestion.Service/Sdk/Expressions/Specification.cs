@@ -30,10 +30,10 @@ namespace Bb.Sdk.Expressions
 
         }
 
-        public void Initialize<TEntities>(SpecificationFactory<TEntities> specificationFactory) where TEntities : ISuggerableModel
+        public void Initialize<TEntities>(ISpecificationFactory<TEntities> specificationFactory) where TEntities : ISuggerableModel
         {
 
-            this._diagnostics = specificationFactory.Repository.Diagnostic;
+            this._diagnostics = (specificationFactory as SpecificationFactory<TEntities>).Repository.Diagnostic;
 
             if (this._diagnostics.DiagnosticMode)
             {
@@ -146,7 +146,7 @@ namespace Bb.Sdk.Expressions
 
         private Expression<Func<T, bool>> _predicate;
         private Func<T, bool> fnc;
-        private DiagnosticExpression _diagnostics;
+        private PerformanceDiagnosticExpression _diagnostics;
 
     }
 

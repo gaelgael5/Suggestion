@@ -8,7 +8,7 @@ using System.Text;
 namespace Bb.Suggestion.Service
 {
 
-    public class SpecificationFactory<TEntities>
+    public class SpecificationFactory<TEntities> : ISpecificationFactory<TEntities>
         where TEntities : ISuggerableModel
     {
 
@@ -16,7 +16,6 @@ namespace Bb.Suggestion.Service
         {
             this._ruleRepository = repository;
         }
-
 
         /// <summary>
         /// Gets the specified rule by specified name and arguments.
@@ -43,7 +42,7 @@ namespace Bb.Suggestion.Service
         /// Gets the specified rule name.
         /// </summary>
         /// <param name="ruleName">Name of the rule.</param>
-        /// <param name="type">The type.</param>
+        /// <param name="types">The type.</param>
         /// <param name="args">The arguments.</param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException">
@@ -53,25 +52,48 @@ namespace Bb.Suggestion.Service
         /// or
         /// args
         /// </exception>
-        public ISpecification<TEntities> Get(string ruleName, Type[] type, object[] args)
+        public ISpecification<TEntities> Get(string ruleName, Type[] types, object[] args)
         {
 
             if (ruleName == null)
                 throw new ArgumentNullException(nameof(ruleName));
 
-            if (type == null)
-                throw new ArgumentNullException(nameof(type));
+            if (types == null)
+                throw new ArgumentNullException(nameof(types));
 
             if (args == null)
                 throw new ArgumentNullException(nameof(args));
 
-            var activator = this._ruleRepository.Resolve(ruleName, type);
-            ISpecification<TEntities> result = activator(args);
+            var ruleInfo = this._ruleRepository.Resolve(ruleName, types);
+            ISpecification<TEntities> result = ruleInfo.Factory(args);
             result.Initialize(this);
+
             return result;
+
         }
 
-        public RuleRepository<TEntities> Repository { get { return this._ruleRepository; } }
+        public ISpecification<TEntities> Get(RuleInfo ruleInfo, object[] args)
+        {
+            if (ruleInfo == null)
+                throw new ArgumentNullException(nameof(ruleInfo));
+
+            if (args == null)
+                throw new ArgumentNullException(nameof(args));
+
+            ISpecification<TEntities> result = (ruleInfo as RuleInfo<TEntities>).Factory(args);
+            result.Initialize(this);
+
+            return result;
+
+        }
+
+        public RuleInfo Resolve(string ruleName, Type[] types)
+        {
+            var ruleInfo = this._ruleRepository.Resolve(ruleName, types);
+            return ruleInfo;
+        }
+
+        internal RuleRepository<TEntities> Repository { get { return this._ruleRepository; } }
 
         private readonly RuleRepository<TEntities> _ruleRepository;
 
