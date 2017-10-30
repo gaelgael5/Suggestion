@@ -1,6 +1,7 @@
 ﻿using System;
 using Bb.Sdk.Expressions;
 using Bb.Suggestion.Models;
+using System.Linq.Expressions;
 
 namespace Bb.Suggestion.Service
 {
@@ -29,7 +30,7 @@ namespace Bb.Suggestion.Service
         /// <param name="ruleName">Name of the rule.</param>
         /// <param name="types">The types.</param>
         /// <returns></returns>
-        RuleInfo Resolve(string ruleName, Type[] types);
+        RuleInfo ResolveRule(string ruleName, Type[] types);
 
         /// <summary>
         /// return an instance of specification for the specified rule name and types
@@ -37,7 +38,14 @@ namespace Bb.Suggestion.Service
         /// <param name="rule">The rule.</param>
         /// <param name="args">The arguments.</param>
         /// <returns></returns>
-        ISpecification<TEntities> Get(RuleInfo rule, object[] args);
+        Func<ISpecification<TEntities>> Get(RuleInfo rule, object[] args);
+
+        /// <summary>
+        /// Return a new expression that resolve constant.
+        /// </summary>
+        /// <param name="constantName">Name of the constant.</param>
+        /// <returns><see cref="Expression"/> </returns>
+        Expression ResolveConstant(string txt);
 
     }
 }

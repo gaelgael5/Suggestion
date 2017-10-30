@@ -5,8 +5,10 @@ using Bb.Suggestion.Models;
 using Bb.Suggestion.Sdk.Attributes;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 
 namespace Bb.Suggestion.Service
 {
@@ -41,7 +43,7 @@ namespace Bb.Suggestion.Service
         /// append all types found in assemblies where type is assignable <see cref="ISpecification<TEntities>.
         /// </summary>
         /// <param name="assemblies">The assemblies.</param>
-        public int ResolveType(params Assembly[] assemblies)
+        public int ResolveRuleType(params Assembly[] assemblies)
         {
 
             int count = 0;
@@ -49,14 +51,19 @@ namespace Bb.Suggestion.Service
             List<Type> types = null;
 
             if (assemblies.Length == 0)
+            {
                 types = this.typeRepository.Resolve(typeof(ISpecification<TEntities>));
+            }
             else
+            {
                 types = this.typeRepository.Resolve(typeof(ISpecification<TEntities>), assemblies);
+            }
 
             foreach (var type in types)
                 count += Add(type);
 
             return count;
+
         }
 
         /// <summary>
@@ -95,10 +102,32 @@ namespace Bb.Suggestion.Service
             if (this._lookup == null)
                 this._lookup = _rules.ToLookup(c => c.Name.ToLower());
 
-
             var items = this._lookup[name.ToLower()] // rules indexed by name
                 .Where(c => c.Parameters.Length == types.Length)
                 .ToList();
+
+            if (items.Count == 0)
+            {
+
+                StringBuilder sb = new StringBuilder();
+                sb.Append($"missing method {name}({ string.Join(',', types.Select(c => c.Name)) }).");
+
+                items = this._lookup[name.ToLower()].ToList();
+                if (items.Count > 0)
+                {
+                    sb.AppendLine($" Please considere other method '{name}' exists.");
+                    foreach (var item in items)
+                    {
+                        var t = $"{name}({string.Join(',', item.Parameters.Select(c => c.ParameterType.Name))})";
+                        sb.AppendLine(t);
+                    }
+                }
+
+                sb.Append($" You can show all methods with the command 'SHOW METHODS' or 'SHOW METHOD \"{name}\"'.");
+
+                throw new SyntaxErrorException(sb.ToString());
+
+            }
 
             var crcTypes = RuleInfo.Comparer.GetHashCode(types);
             var items2 = items.Where(c => c.HashParameters == crcTypes).ToList();   // find rules where parameters match

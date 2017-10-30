@@ -20,5 +20,6 @@ namespace Black.Beard.Suggestion.UnitTests.Models
 
         public IPoint Location { get; }
         public int Key { get; internal set; }
+        public object Value { get; internal set; }
     }
 }

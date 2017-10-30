@@ -6,11 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Suggestion\Exceptions\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Black.Beard.Sdk\Black.Beard.Sdk.csproj" />
+    <Compile Remove="Serializer.cs" />
   </ItemGroup>
 
 </Project>

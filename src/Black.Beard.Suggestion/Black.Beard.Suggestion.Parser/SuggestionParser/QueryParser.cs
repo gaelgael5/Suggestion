@@ -46,6 +46,7 @@ namespace Bb.Suggestion.SuggestionParser
                     SelectVisitor<TEntities> visitor = new SelectVisitor<TEntities>(this._context);
                     visitor.Visit(ast);
                     result = visitor.Result;
+                    result.Initialize<TEntities>();
 
                     //switch (ast)
                     //{
@@ -83,9 +84,8 @@ namespace Bb.Suggestion.SuggestionParser
    
         }
 
-
-
         private readonly QueryContext<TEntities> _context;
+
 
     }
 

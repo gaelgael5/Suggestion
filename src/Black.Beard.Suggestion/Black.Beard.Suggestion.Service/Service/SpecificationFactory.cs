@@ -3,6 +3,7 @@ using Bb.Suggestion.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 
 namespace Bb.Suggestion.Service
@@ -12,9 +13,10 @@ namespace Bb.Suggestion.Service
         where TEntities : ISuggerableModel
     {
 
-        public SpecificationFactory(RuleRepository<TEntities> repository)
+        public SpecificationFactory(RuleRepository<TEntities> repositoryRule, ConstantRepository repositoryConstant)
         {
-            this._ruleRepository = repository;
+            this._ruleRepository = repositoryRule;
+            this._constantRepository = repositoryConstant;
         }
 
         /// <summary>
@@ -72,30 +74,67 @@ namespace Bb.Suggestion.Service
 
         }
 
-        public ISpecification<TEntities> Get(RuleInfo ruleInfo, object[] args)
+        public  Func<ISpecification<TEntities>> Get(RuleInfo ruleInfo, object[] args)
         {
+
             if (ruleInfo == null)
                 throw new ArgumentNullException(nameof(ruleInfo));
 
             if (args == null)
                 throw new ArgumentNullException(nameof(args));
 
-            ISpecification<TEntities> result = (ruleInfo as RuleInfo<TEntities>).Factory(args);
-            result.Initialize(this);
+            Func<ISpecification<TEntities>> _fnc = () =>
+            {
 
-            return result;
+                object[] _args = new object[args.Length];
+                for (int i = 0; i < _args.Length; i++)
+                {
+                    var value = args[i];
+                    if (value is Func<object> r)
+                        value = r();
+
+                    _args[i] = value;
+                }
+
+                ISpecification<TEntities> _result = (ruleInfo as RuleInfo<TEntities>).Factory(_args);
+                _result.Initialize(this);
+
+                return _result;
+
+            };           
+
+            return _fnc;
 
         }
 
-        public RuleInfo Resolve(string ruleName, Type[] types)
+        /// <summary>
+        /// return rule for the specified rule name and types.
+        /// </summary>
+        /// <param name="ruleName">Name of the rule.</param>
+        /// <param name="types">The types.</param>
+        /// <returns></returns>
+        public RuleInfo ResolveRule(string ruleName, Type[] types)
         {
             var ruleInfo = this._ruleRepository.Resolve(ruleName, types);
             return ruleInfo;
         }
 
-        internal RuleRepository<TEntities> Repository { get { return this._ruleRepository; } }
+        /// <summary>
+        /// Return a new expression that resolve constant.
+        /// </summary>
+        /// <param name="constantName">Name of the constant.</param>
+        /// <returns><see cref="Expression"/> </returns>
+        public Expression ResolveConstant(string constantName)
+        {
+            return this._constantRepository.Resolve(constantName);
+        }
+
+        internal RuleRepository<TEntities> RuleRepository { get { return this._ruleRepository; } }
+
+        internal ConstantRepository ConstantRepository { get { return this._constantRepository; } }
 
         private readonly RuleRepository<TEntities> _ruleRepository;
+        private readonly ConstantRepository _constantRepository;
 
     }
 

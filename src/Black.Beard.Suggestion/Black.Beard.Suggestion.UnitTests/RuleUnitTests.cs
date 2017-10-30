@@ -56,7 +56,7 @@ namespace Black.Beard.Suggestion.UnitTests
 
             RuleRepository<Site> repository = new RuleRepository<Site>();
 
-            var a = repository.ResolveType(typeof(RuleSuggerable).Assembly);
+            var a = repository.ResolveRuleType(typeof(RuleSuggerable).Assembly);
 
             Assert.IsTrue(a > 0);
 
@@ -66,9 +66,10 @@ namespace Black.Beard.Suggestion.UnitTests
         public void EvaluateDiscoveryResolverAndActivateWithNoArgument()
         {
 
-            RuleRepository<Site> repository = new RuleRepository<Site>();
-            SpecificationFactory<Site> _factory = new SpecificationFactory<Site>(repository);
-            var a = repository.ResolveType(typeof(RuleSuggerable).Assembly);
+            ConstantRepository repository1 = new ConstantRepository();
+            RuleRepository<Site> repository2 = new RuleRepository<Site>();
+            SpecificationFactory<Site> _factory = new SpecificationFactory<Site>(repository2, repository1);
+            var a = repository2.ResolveRuleType(typeof(RuleSuggerable).Assembly);
 
             var specification = _factory.Get("Suggerable", new object[] { });
 
@@ -80,10 +81,10 @@ namespace Black.Beard.Suggestion.UnitTests
         [TestMethod]
         public void EvaluateDiscoveryResolverAndActivateWithArguments()
         {
-
-            RuleRepository<Site> repository = new RuleRepository<Site>();
-            SpecificationFactory<Site> _factory = new SpecificationFactory<Site>(repository);
-            var a = repository.ResolveType(typeof(RuleSuggerable).Assembly);
+            ConstantRepository repository1 = new ConstantRepository();
+            RuleRepository<Site> repository2 = new RuleRepository<Site>();
+            SpecificationFactory<Site> _factory = new SpecificationFactory<Site>(repository2, repository1);
+            var a = repository2.ResolveRuleType(typeof(RuleSuggerable).Assembly);
 
             var specification = _factory.Get("InIndex", new object[] { new int[] { 1, 2, 3 } });
 
@@ -98,9 +99,10 @@ namespace Black.Beard.Suggestion.UnitTests
         {
 
             PerformanceDiagnosticExpression diag = new PerformanceDiagnosticExpression() { DiagnosticMode = true };
-            RuleRepository<Site> repository = new RuleRepository<Site>(diag);
-            SpecificationFactory<Site> _factory = new SpecificationFactory<Site>(repository);
-            var a = repository.ResolveType(typeof(RuleSuggerable).Assembly);
+            ConstantRepository repository1 = new ConstantRepository();
+            RuleRepository<Site> repository2 = new RuleRepository<Site>(diag);
+            SpecificationFactory<Site> _factory = new SpecificationFactory<Site>(repository2, repository1);
+            var a = repository2.ResolveRuleType(typeof(RuleSuggerable).Assembly);
 
 
             var site = new Site() { Key = 4, IsSuggrable = true };
@@ -122,9 +124,10 @@ namespace Black.Beard.Suggestion.UnitTests
         {
 
             PerformanceDiagnosticExpression diag = new PerformanceDiagnosticExpression() { DiagnosticMode = true };
-            RuleRepository<Site> repository = new RuleRepository<Site>(diag);
-            SpecificationFactory<Site> _factory = new SpecificationFactory<Site>(repository);
-            var a = repository.ResolveType(typeof(RuleSuggerable).Assembly);
+            ConstantRepository repository1 = new ConstantRepository();
+            RuleRepository<Site> repository2 = new RuleRepository<Site>(diag);
+            SpecificationFactory<Site> _factory = new SpecificationFactory<Site>(repository2, repository1);
+            var a = repository2.ResolveRuleType(typeof(RuleSuggerable).Assembly);
 
 
             var site = new Site() { Key = 4, IsSuggrable = true };
@@ -146,9 +149,10 @@ namespace Black.Beard.Suggestion.UnitTests
         {
 
             PerformanceDiagnosticExpression diag = new PerformanceDiagnosticExpression() { DiagnosticMode = true };
-            RuleRepository<Site> repository = new RuleRepository<Site>(diag);
-            SpecificationFactory<Site> _factory = new SpecificationFactory<Site>(repository);
-            var a = repository.ResolveType(typeof(RuleSuggerable).Assembly);
+            ConstantRepository repository1 = new ConstantRepository();
+            RuleRepository<Site> repository2 = new RuleRepository<Site>(diag);
+            SpecificationFactory<Site> _factory = new SpecificationFactory<Site>(repository2, repository1);
+            var a = repository1.ResolveRuleType(typeof(RuleSuggerable).Assembly);
 
 
             var site = new Site() { Key = 4, IsSuggrable = true };

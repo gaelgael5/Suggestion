@@ -1,9 +1,0 @@
-C:\github\Suggestion\src\Black.Beard.Suggestion\Black.Beard.Suggestion.Models\bin\Debug\netstandard2.0\Black.Beard.Suggestion.Models.deps.json
-C:\github\Suggestion\src\Black.Beard.Suggestion\Black.Beard.Suggestion.Models\bin\Debug\netstandard2.0\Black.Beard.Suggestion.Models.dll
-C:\github\Suggestion\src\Black.Beard.Suggestion\Black.Beard.Suggestion.Models\bin\Debug\netstandard2.0\Black.Beard.Suggestion.Models.pdb
-C:\github\Suggestion\src\Black.Beard.Suggestion\Black.Beard.Suggestion.Models\obj\Debug\netstandard2.0\Black.Beard.Suggestion.Models.csprojResolveAssemblyReference.cache
-C:\github\Suggestion\src\Black.Beard.Suggestion\Black.Beard.Suggestion.Models\obj\Debug\netstandard2.0\Black.Beard.Suggestion.Models.csproj.CoreCompileInputs.cache
-C:\github\Suggestion\src\Black.Beard.Suggestion\Black.Beard.Suggestion.Models\obj\Debug\netstandard2.0\Black.Beard.Suggestion.Models.AssemblyInfoInputs.cache
-C:\github\Suggestion\src\Black.Beard.Suggestion\Black.Beard.Suggestion.Models\obj\Debug\netstandard2.0\Black.Beard.Suggestion.Models.AssemblyInfo.cs
-C:\github\Suggestion\src\Black.Beard.Suggestion\Black.Beard.Suggestion.Models\obj\Debug\netstandard2.0\Black.Beard.Suggestion.Models.dll
-C:\github\Suggestion\src\Black.Beard.Suggestion\Black.Beard.Suggestion.Models\obj\Debug\netstandard2.0\Black.Beard.Suggestion.Models.pdb

@@ -6,12 +6,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Sdk\ComponentModel\MethodDiscovery.cs" />
     <Compile Remove="Sdk\Serializer.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Black.Beard.Suggestion.Models\Black.Beard.Suggestion.Models.csproj" />
+    <ProjectReference Include="..\Black.Beard.Suggestion.Parser\Black.Beard.Suggestion.Parser.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Sdk\" />
   </ItemGroup>
 
 </Project>
