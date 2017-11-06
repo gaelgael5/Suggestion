@@ -1,57 +1,64 @@
-﻿using System;
+﻿using Bb.Specifications;
+using Bb.Suggestion.Models;
+using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Linq;
 using System.Text;
 using Antlr4.Runtime.Misc;
-using Antlr4.Runtime.Tree;
 using System.Linq.Expressions;
-using Bb.Suggestion.Models;
-using Bb.Sdk.Expressions;
-using Bb.Suggestion.Service;
 using System.Globalization;
-using System.Data;
-using Bb.Sdk.Factories;
-using Bb.Expressions;
-using System.Linq;
+using Bb.Specifications.Leafs;
+using System.Reflection;
 
 namespace Bb.Suggestion.SuggestionParser
 {
 
-    public partial class SelectVisitor<TEntitie> : Bb.Suggestion.SuggestionParser.SuggestionBaseVisitor<Expression>
-         where TEntitie : ISuggerableModel
+    public class SelectVisitor<TEntity> : SuggestionBaseVisitor<Expression>
+         where TEntity : ISuggerableModel
     {
 
-        public SelectVisitor(QueryContext<TEntitie> context)
+        static SelectVisitor()
         {
+
+            SelectVisitor<TEntity>.SpecificationLeafAnd = typeof(SpecificationLeafAnd<TEntity>).GetConstructor(new Type[] { typeof(ISpecification<TEntity>), typeof(ISpecification<TEntity>) });
+            SelectVisitor<TEntity>.SpecificationLeafOr = typeof(SpecificationLeafOr<TEntity>).GetConstructor(new Type[] { typeof(ISpecification<TEntity>), typeof(ISpecification<TEntity>) });
+            SelectVisitor<TEntity>.SpecificationLeafNot = typeof(SpecificationLeafNot<TEntity>).GetConstructor(new Type[] { typeof(ISpecification<TEntity>) });
+
+        }
+
+        public SelectVisitor(QueryContext<TEntity> context)
+        {
+
             this._context = context;
-            this._result = new SuggestionQuerySelect();
-            this._dic = new Dictionary<string, parameter>();
-        }
+            this._result = new SuggestionQuerySelect<TEntity>();
 
-        public override Expression VisitAny_name([NotNull] SuggestionParser.Any_nameContext context)
-        {
-            return base.VisitAny_name(context);
-        }
+            this._dic = new Dictionary<string, _Expression_parameter>();
+            this._parameters = new Dictionary<string, QueryParameter>(this._context.Parameters.Count());
+            this._usedParameters = new HashSet<QueryParameter>();
 
-        public override Expression VisitErrorNode(IErrorNode node)
-        {
-            return base.VisitErrorNode(node);
-        }
+            foreach (SuggestionQueryParameter parameter in this._context.Parameters)
+            {
 
-        public override Expression VisitFunction_args_stmt([NotNull] SuggestionParser.Function_args_stmtContext context)
-        {
-            //context.expr
-            return base.VisitFunction_args_stmt(context);
+                parameter.Name = parameter.Name.ToLower();
+
+                if (this._parameters.ContainsKey(parameter.Name))
+                    throw new DuplicateNameException($"binded paramameter {parameter.Name}");
+
+                this._parameters.Add(parameter.Name, new QueryParameter(parameter));
+
+            }
+
         }
 
         public override Expression VisitFunction_stmt([NotNull] SuggestionParser.Function_stmtContext context)
         {
 
             RuleInfo rule;
-            MethodCallExpression methodCallExpression;
-            parameter p;
             string ruleName = context.function_name().GetText();
             Type[] _types = new Type[0];
-            object[] _values = new object[0];
+            Expression[] _expression_values = new Expression[0];
+            _Expression_parameter p;
 
             var args = context.function_args_stmt();
             if (args != null)
@@ -60,101 +67,105 @@ namespace Bb.Suggestion.SuggestionParser
                 var __args = args.expr();
                 int length = __args.Length;
                 _types = new Type[length];
-                _values = new object[length];
 
-                Expression[] _args = new Expression[length];
+                StringBuilder sb = new StringBuilder();
+                _expression_values = new Expression[length];
                 for (int index = 0; index < length; index++)
                 {
                     var expr = __args[index];
                     var _e = this.Visit(expr);
-                    _args[index] = _e;
+                    _expression_values[index] = _e;
                     _types[index] = _e.Type;
-                    _values[index] = _e.GetValue();
+                    sb.Append(GetKeyText(_e));
                 }
 
                 rule = this._context.Factory.ResolveRule(ruleName, _types);
-                p = GetParameter("arg_" + ruleName, _values, rule);
-                if (p.Tardive)
-                {
-                    //Expression i = p.Constant.Type == rule.Type
-                    //        ? (Expression)p.Variable
-                    //        : Expression.Convert(p.Variable, rule.Type);
-                    methodCallExpression = Expression.Call(Expression.Convert(p.Variable, rule.Type), rule.Method, GetModelParameter());
-                }
-                else
-                {
-                    Expression i = p.Constant.Type == rule.Type
-                            ? (Expression)p.Constant
-                            : (Expression)Expression.Convert(p.Constant, rule.Type);
+                string _n = $"arg_{ruleName}_{sb.ToString().GetHashCode()}";
+                p = GetParameter(_n, _expression_values, rule);
 
-                    methodCallExpression = Expression.Call(i, rule.Method, GetModelParameter());
-                }
-                return methodCallExpression;
+                return p.Expression;
 
             }
 
             rule = this._context.Factory.ResolveRule(ruleName, new Type[] { });
-            p = GetParameter("arg_" + ruleName, _values, rule);
-            methodCallExpression = Expression.Call(Expression.Convert(p.Constant, rule.Type), rule.Method, GetModelParameter());
+            p = GetParameter("arg_" + ruleName, _expression_values, rule);
 
-            return methodCallExpression;
-
-        }
-
-        /// <summary>
-        /// Determines one of arguments is function.
-        /// if true, the specification be re-created every time for evaluation
-        /// </summary>
-        /// <param name="args">The arguments.</param>
-        /// <returns>
-        ///   <c>true</c> if the specified arguments is tardive; otherwise, <c>false</c>.
-        /// </returns>
-        private static bool IsTardive(object[] args)
-        {
-            for (int i = 0; i < args.Length; i++)
-                if (args[i] is Func<object> r)
-                    return true;
-            return false;
-        }
-
-        private ParameterExpression GetModelParameter()
-        {
-            if (this.argumentModel == null)
-                this.argumentModel = Expression.Parameter(typeof(TEntitie), "model");
-            return this.argumentModel;
-        }
-
-        private parameter GetParameter(string argName, object[] _values, RuleInfo rule)
-        {
-
-            parameter p;
-
-            if (!this._dic.TryGetValue(argName, out p))
-            {
-                bool tardive = IsTardive(_values);
-                Func<ISpecification<TEntitie>> s = this._context.Factory.Get(rule, _values);
-                p = p = new parameter(argName, s, tardive, rule);
-                this._dic.Add(argName, p);
-            }
-
-            return p;
+            return p.Expression;
 
         }
 
         public override Expression VisitWhere_stmt([NotNull] SuggestionParser.Where_stmtContext context)
         {
-            this._result.Where = new SuggestionQueryFilter();
+
             var result = base.VisitWhere_stmt(context);
-            this._result.Where = new SuggestionQueryFilter()
+
+            List<Expression> lst = new List<Expression>();
+            ParameterExpression arg = Expression.Parameter(typeof(object[]), "arg");
+
+            int _index = 0;
+            ParameterExpression[] _pTarget = new ParameterExpression[this._usedParameters.Count];
+            foreach (QueryParameter parameter in this._usedParameters)
             {
-                FilterExpression = result,
-                ArgumentModel = GetModelParameter(),
-                Parameters = this._dic.Values
-                .Where(c => c.Tardive)
-                .Select(c => new KeyValuePair<string, object>(c.Name, c.Specification))
-                .ToList(),
-            };
-            return result;
+                Expression index = Expression.Constant(_index);
+                _pTarget[_index] = parameter.Expression;
+
+                Expression paramAccessorExp = Expression.ArrayIndex(arg, index);
+                Expression paramCastExp = Expression.Convert(paramAccessorExp, parameter.Expression.Type);
+
+                var u = Expression.Assign(parameter.Expression, paramCastExp);
+
+                lst.Add(u);
+
+                _index++;
+            }
+
+            lst.Add(result);
+
+            var blk = Expression.Block(_pTarget, lst.ToArray());
+
+            var lbd = Expression.Lambda<Func<object[], ISpecification<TEntity>>>(blk, arg);
+
+            this._result.Where = lbd.Compile();
+
+            return null;
+
+        }
+
+
+        public override Expression VisitDatetime_expr([NotNull] SuggestionParser.Datetime_exprContext context)
+        {
+
+            string mask = string.Empty;
+            string date = context.Datetime().GetText();
+
+            try
+            {
+
+                DateTime dte;
+                date = date.Substring(1, date.Length - 2);
+                var _mask = context.String_literal();
+
+                if (_mask != null)
+                {
+                    mask = _mask.GetText();
+                    mask = mask.Substring(1, mask.Length - 2);
+
+                    dte = DateTime.ParseExact(date, mask, CultureInfo.InvariantCulture);
+                    return Expression.Constant(dte);
+                }
+
+                dte = DateTime.Parse(date, CultureInfo.InvariantCulture);
+                return Expression.Constant(dte);
+
+            }
+            catch (FormatException e)
+            {
+                if (string.IsNullOrEmpty(mask))
+                    throw new FormatException($"{date} at position {context.Start.StartIndex} ({context.Start.Line}:{context.Start.Column})");
+                else
+                    throw new FormatException($"{date} -> '{mask}' at position {context.Start.StartIndex} ({context.Start.Line}:{context.Start.Column})");
+            }
+
         }
 
         public override Expression VisitExpr([NotNull] SuggestionParser.ExprContext context)
@@ -173,13 +184,13 @@ namespace Bb.Suggestion.SuggestionParser
                 switch (p)
                 {
                     case "&":
-                        return Expression.And(left, right);
                     case "&&":
-                        return Expression.AndAlso(left, right);
+                        return Expression.New(SelectVisitor<TEntity>.SpecificationLeafAnd, left, right);
+
                     case "|":
-                        return Expression.Or(left, right);
                     case "||":
-                        return Expression.OrElse(left, right);
+                        return Expression.New(SelectVisitor<TEntity>.SpecificationLeafOr, left, right);
+
                     default:
                         if (System.Diagnostics.Debugger.IsAttached)
                             System.Diagnostics.Debugger.Break();
@@ -201,7 +212,8 @@ namespace Bb.Suggestion.SuggestionParser
             switch (_operator)
             {
                 case "!":
-                    return Expression.Not(expression);
+                    return Expression.New(SelectVisitor<TEntity>.SpecificationLeafNot, expression);
+
                 default:
                     if (System.Diagnostics.Debugger.IsAttached)
                         System.Diagnostics.Debugger.Break();
@@ -219,17 +231,15 @@ namespace Bb.Suggestion.SuggestionParser
 
         public override Expression VisitBind_parameter([NotNull] SuggestionParser.Bind_parameterContext context)
         {
-            return base.VisitBind_parameter(context);
-        }
+            QueryParameter parameter;
+            var binded_parameter_name = context.GetText().ToLower();
+            if (!this._parameters.TryGetValue(binded_parameter_name, out parameter))
+                throw new KeyNotFoundException($"{binded_parameter_name} at position {context.Start.StartIndex} ({context.Start.Line}:{context.Start.Column}). ");
 
-        public override Expression VisitBoolean_binary_operator([NotNull] SuggestionParser.Boolean_binary_operatorContext context)
-        {
-            return base.VisitBoolean_binary_operator(context);
-        }
 
-        public override Expression VisitVariable([NotNull] SuggestionParser.VariableContext context)
-        {
-            return base.VisitVariable(context);
+            this._usedParameters.Add(parameter);
+            return parameter.Expression;
+
         }
 
         public override Expression VisitConstant([NotNull] SuggestionParser.ConstantContext context)
@@ -243,11 +253,6 @@ namespace Bb.Suggestion.SuggestionParser
 
             return result;
 
-        }
-
-        public override Expression VisitNumeric_binary_operator([NotNull] SuggestionParser.Numeric_binary_operatorContext context)
-        {
-            return base.VisitNumeric_binary_operator(context);
         }
 
         public override Expression VisitNumeric_double_literal([NotNull] SuggestionParser.Numeric_double_literalContext context)
@@ -307,7 +312,7 @@ namespace Bb.Suggestion.SuggestionParser
 
         }
 
-        public override Expression VisitString_literal([NotNull] SuggestionParser.String_literalContext context)
+        public override Expression VisitString_literal_expr([NotNull] SuggestionParser.String_literal_exprContext context)
         {
             var t = context.GetText();
             if (string.IsNullOrEmpty(t))
@@ -316,41 +321,87 @@ namespace Bb.Suggestion.SuggestionParser
 
         }
 
-        public override Expression VisitChar_literal([NotNull] SuggestionParser.Char_literalContext context)
+        public override Expression VisitChar_literal_expr([NotNull] SuggestionParser.Char_literal_exprContext context)
         {
             var t = context.GetText();
             if (t.Length > 3)
-            {
-
-            }
+                throw new SyntaxErrorException($"invalid char expression '{t}'");
             return Expression.Constant(t[1]);
         }
 
-        public override Expression VisitFacet_stmt([NotNull] SuggestionParser.Facet_stmtContext context)
-        {
-            return base.VisitFacet_stmt(context);
-        }
 
-        public override Expression VisitIdentifier_stmt([NotNull] SuggestionParser.Identifier_stmtContext context)
-        {
-            return base.VisitIdentifier_stmt(context);
-        }
-
-        public override Expression VisitOrder_stmt([NotNull] SuggestionParser.Order_stmtContext context)
-        {
-            return base.VisitOrder_stmt(context);
-        }
 
 
 
         public SuggestionQuery Result { get { return this._result; } }
 
-        public QueryContext<TEntitie> _context { get; }
+        private readonly QueryContext<TEntity> _context;
+        private readonly SuggestionQuerySelect<TEntity> _result;
+        private readonly Dictionary<string, _Expression_parameter> _dic;
+        private readonly Dictionary<string, QueryParameter> _parameters;
+        private readonly static ConstructorInfo SpecificationLeafAnd;
+        private readonly static ConstructorInfo SpecificationLeafOr;
+        private readonly static ConstructorInfo SpecificationLeafNot;
+        private HashSet<QueryParameter> _usedParameters;
 
-        private readonly SuggestionQuerySelect _result;
-        private Dictionary<string, parameter> _dic;
-        private ParameterExpression argumentModel;
-        private HashSet<parameter> _rules;
+        private _Expression_parameter GetParameter(string argName, Expression[] _expression_values, RuleInfo rule)
+        {
+
+            _Expression_parameter p;
+
+            if (!this._dic.TryGetValue(argName, out p))
+            {
+                p = _Expression_parameter.Create<TEntity>(argName, rule, _expression_values);
+                this._dic.Add(argName, p);
+            }
+
+            return p;
+
+        }
+
+        private static string GetKeyText(Expression e)
+        {
+
+            switch (e)
+            {
+
+                case ParameterExpression c:
+                    return c.Name;
+
+                case MemberExpression c:
+                    return c.Member.Name;
+
+                case ConstantExpression c:
+                    return c.Value.ToString();
+
+                case NewArrayExpression c:
+                    return GetKeyText(c);
+
+                default:
+                    if (System.Diagnostics.Debugger.IsAttached)
+                        System.Diagnostics.Debugger.Break();
+                    break;
+            }
+
+            return null;
+
+        }
+
+        private static string GetKeyText(NewArrayExpression c)
+        {
+            int length = c.Expressions.Count;
+            StringBuilder sb = new StringBuilder();
+            sb.Append("{");
+            for (int index = 0; index < length; index++)
+            {
+                var item = c.Expressions[index];
+                var value = GetKeyText(item);
+                sb.Append(value);
+                sb.Append(", ");
+            }
+            sb.Append("}");
+            return sb.ToString();
+        }
+
     }
-
 }

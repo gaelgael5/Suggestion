@@ -1,4 +1,5 @@
 using Bb.Sdk.Expressions;
+using Bb.Specifications;
 using Bb.Suggestion.Models;
 using Bb.Suggestion.Service;
 using Bb.Suggestion.SuggestionParser;
@@ -7,6 +8,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace Black.Beard.Suggestion.UnitTests
 {
@@ -14,13 +16,6 @@ namespace Black.Beard.Suggestion.UnitTests
     public class ParsingUnitTests
     {
 
-        [TestMethod]
-        public void EvaluateQueryFilterWithArgument()
-        {
-            var filter = GetFilter("WHERE InIndex([1, 2, 3])");
-            Assert.AreEqual(filter(new Site() { Key = 1 }), true);
-            Assert.AreEqual(filter(new Site() { Key = 4 }), false);
-        }
 
         [TestMethod]
         public void EvaluateQueryFilterWithoutArgument()
@@ -28,6 +23,14 @@ namespace Black.Beard.Suggestion.UnitTests
             var filter = GetFilter("WHERE Suggerable()");
             Assert.AreEqual(filter(new Site() { IsSuggrable = true }), true);
             Assert.AreEqual(filter(new Site() { IsSuggrable = false }), false);
+        }
+
+        [TestMethod]
+        public void EvaluateQueryFilterWithArgument()
+        {
+            var filter = GetFilter("WHERE InIndex([1, 2, 3])");
+            Assert.AreEqual(filter(new Site() { Key = 1 }), true);
+            Assert.AreEqual(filter(new Site() { Key = 4 }), false);
         }
 
         [TestMethod]
@@ -111,6 +114,14 @@ namespace Black.Beard.Suggestion.UnitTests
         }
 
         [TestMethod]
+        public void EvaluateQueryFilterBoolWithParameter()
+        {
+            var filter = GetFilter(@"WHERE MatchBool(:param1)", new SuggestionQueryParameter() { Name = ":param1", Type = typeof(bool).AssemblyQualifiedName, Value = "false" });
+            Assert.AreEqual(filter(new Site() { Value = false }), true);
+            Assert.AreEqual(filter(new Site() { Value = true }), false);
+        }
+
+        [TestMethod]
         public void EvaluateQueryFilterBoolFalse()
         {
             var filter = GetFilter(@"WHERE MatchBool($false)");
@@ -121,25 +132,18 @@ namespace Black.Beard.Suggestion.UnitTests
         [TestMethod]
         public void EvaluateQueryFilterDate()
         {
-            var filter = GetFilter(@"WHERE MatchDate(2010-10-20 ""yyyy-MM-dd"")");
+            var filter = GetFilter(@"WHERE MatchDate(/2010-20-10/ ""yyyy-dd-MM"")");
+            Assert.AreEqual(filter(new Site() { Value = new DateTime(2010, 10, 20) }), true);
+            Assert.AreEqual(filter(new Site() { Value = new DateTime(2020, 10, 20) }), false);
+
         }
 
         [TestMethod]
         public void EvaluateQueryFilterDate2()
         {
-            var filter = GetFilter(@"WHERE MatchDate(20-10-2020 ""mm-DD-yyyy"")");
-        }
-
-        [TestMethod]
-        public void EvaluateQueryFilterDate3()
-        {
-            var filter = GetFilter(@"WHERE MatchDate(20-10-2020  ""mm-DD-yyyy hh:mm:ss"")");
-        }
-
-        [TestMethod]
-        public void EvaluateQueryFilterDate4()
-        {
-            var filter = GetFilter(@"WHERE MatchDate(20-10-2020 20:10:00.23  ""mm-DD-yyyy hh:mm:ss.ff"")");
+            var filter = GetFilter(@"WHERE MatchDate(/20-10-2020/ ""dd-MM-yyyy"")");
+            Assert.AreEqual(filter(new Site() { Value = new DateTime(2010, 10, 20) }), false);
+            Assert.AreEqual(filter(new Site() { Value = new DateTime(2020, 10, 20) }), true);
         }
 
         [TestMethod]
@@ -147,6 +151,20 @@ namespace Black.Beard.Suggestion.UnitTests
         {
             var filter = GetFilter(@"WHERE MatchDate($CURRENT_DATE)");
             Assert.IsTrue(filter(new Site() { Value = DateTime.Now.Date }));
+        }
+
+        [TestMethod]
+        public void EvaluateQueryFilterDate3()
+        {
+            var filter = GetFilter(@"WHERE MatchDate(/20-10-2020 23:25:34/ ""dd-MM-yyyy hh:mm:ss"")");
+            Assert.AreEqual(filter(new Site() { Value = new DateTime(2020, 10, 20, 23, 25, 34) }), true);
+            Assert.AreEqual(filter(new Site() { Value = new DateTime(2020, 10, 20) }), false);
+        }
+
+        [TestMethod]
+        public void EvaluateQueryFilterDate4()
+        {
+            var filter = GetFilter(@"WHERE MatchDate(/20-10-2020 20:10:00.23/  ""dd-MM-yyyy hh:mm:ss.ff"")");
         }
 
         [TestMethod]
@@ -162,13 +180,13 @@ namespace Black.Beard.Suggestion.UnitTests
         }
 
         [TestMethod]
-        public void EvaluateShowMethodes()
+        public void EvaluateShowMethods()
         {
             var filter = GetFilter("SHOW METHODS");
         }
 
         [TestMethod]
-        public void EvaluateShowMethode()
+        public void EvaluateShowMethod()
         {
             var filter = GetFilter("SHOW METHOD InIndex");
         }
@@ -183,28 +201,30 @@ namespace Black.Beard.Suggestion.UnitTests
             var filter5 = GetFilter(@"WHERE MatchString(""toto"")");
         }
 
-        private static Func<Site, bool> GetFilter(string query)
+        private static Func<Site, bool> GetFilter(string query, params SuggestionQueryParameter[] parameters)
         {
-            var parser = CreateParser();
-            var _query = parser.Parse(query) as SuggestionQuerySelect;
-            var filter = _query.Where.Filter as Func<Site, bool>;
-            return filter;
+            var parser = CreateParser(parameters);
+            var _query = parser.Parse(query) as SuggestionQuerySelect<Site>;
+            var arg = parameters.Select(c => c.GetValue()).Cast<object>().ToArray();
+            ISpecification<Site> filter = _query.Where(arg); //.Filter.Build(parser.Context);
+            return filter.IsSatisfiedBy;
         }
 
-        private static QueryParser<Site> CreateParser()
+        private static QueryParser<Site> CreateParser(SuggestionQueryParameter[] parameters)
         {
             RuleRepository<Site> repository1 = new RuleRepository<Site>();
             ConstantRepository repository2 = new ConstantRepository();
             SpecificationFactory<Site> _factory = new SpecificationFactory<Site>(repository1, repository2);
             var a = repository1.ResolveRuleType(typeof(RuleSuggerable).Assembly);
 
-            var ctx = new QueryContext<Site>(_factory);
+            var ctx = new QueryContext<Site>(_factory, parameters);
 
             QueryParser<Site> parser = new QueryParser<Site>(ctx);
             return parser;
         }
 
     }
+
 }
 /*
  

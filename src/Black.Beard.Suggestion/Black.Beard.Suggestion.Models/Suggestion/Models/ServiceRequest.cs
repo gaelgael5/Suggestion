@@ -8,8 +8,6 @@ namespace Bb.Suggestion.Models
 
         public SuggestionQuery Query { get; set; }
 
-        public List<SuggestionQueryParameter> Parameters { get; set; }
-
     }
 
 }

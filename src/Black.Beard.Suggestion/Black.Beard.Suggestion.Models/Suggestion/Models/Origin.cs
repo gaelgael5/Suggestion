@@ -15,11 +15,7 @@ namespace Bb.Suggestion.Models
         public double Y { get; set; }
 
         public Address Address { get; set; }
-
-        internal void Initialize()
-        {
-            throw new NotImplementedException();
-        }
+   
     }
 
 }

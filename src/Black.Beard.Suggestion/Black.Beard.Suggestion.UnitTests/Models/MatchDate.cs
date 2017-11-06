@@ -8,7 +8,7 @@ using System.Linq.Expressions;
 namespace Black.Beard.Suggestion.UnitTests.Models
 {
 
-    public class MatchDate : Specification<Site>
+    public class MatchDate : ExpressionSpecification<Site>
     {
 
         [RuleName("MatchDate")]

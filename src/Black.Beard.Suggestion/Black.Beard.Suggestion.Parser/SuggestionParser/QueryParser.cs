@@ -1,5 +1,6 @@
 ﻿using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
+using Bb.Specifications;
 using Bb.Suggestion.Models;
 using System;
 using System.Collections.Generic;
@@ -8,19 +9,18 @@ using System.Text;
 namespace Bb.Suggestion.SuggestionParser
 {
 
-    public class QueryParser<TEntities>
-        where TEntities : ISuggerableModel
+    public class QueryParser<TEntity>
+        where TEntity : ISuggerableModel
     {
 
         public List<Exception> Exceptions { get; }
 
-        public QueryParser(QueryContext<TEntities> context)
+        public QueryParser(QueryContext<TEntity> context)
         {
             this._context = context;
             //var grammar = new SuggestionGrammar();
             //this.parser = new Parser(grammar);
-            this.Exceptions = new List<Exception>();
-
+            this.Exceptions = new List<Exception>();            
         }
 
         public SuggestionQuery Parse(string sourceText)
@@ -42,31 +42,9 @@ namespace Bb.Suggestion.SuggestionParser
                 
                 foreach (IParseTree ast in context.children)
                 {
-
-                    SelectVisitor<TEntities> visitor = new SelectVisitor<TEntities>(this._context);
+                    SelectVisitor<TEntity> visitor = new SelectVisitor<TEntity>(this._context);
                     visitor.Visit(ast);
                     result = visitor.Result;
-                    result.Initialize<TEntities>();
-
-                    //switch (ast)
-                    //{
-
-                    //    case Bb.Suggestion.SuggestionParser.SuggestionParser.Sql_stmt_listContext stmtContext:
-
-                    //        break;
-
-                    //    case Bb.Suggestion.SuggestionParser.SuggestionParser.Select_stmtContext stmtContext:
-                    //        SelectVisitor visitor = new SelectVisitor();
-                    //        visitor.Visit(ast);
-                    //        result = visitor.Result;
-                    //        break;
-
-                    //    default:
-                    //        if (System.Diagnostics.Debugger.IsAttached)
-                    //            System.Diagnostics.Debugger.Break();
-                    //        break;
-                    //}
-
                 }
 
             }
@@ -84,7 +62,10 @@ namespace Bb.Suggestion.SuggestionParser
    
         }
 
-        private readonly QueryContext<TEntities> _context;
+
+        public  QueryContext<TEntity> Context { get { return this._context; } }
+
+        private readonly QueryContext<TEntity> _context;
 
 
     }

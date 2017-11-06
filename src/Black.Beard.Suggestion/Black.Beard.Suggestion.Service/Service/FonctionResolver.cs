@@ -1,19 +1,20 @@
-﻿using Bb.Suggestion.Models;
+﻿using Bb.Specifications;
+using Bb.Suggestion.Models;
 using System;
 
 namespace Bb.Suggestion.Service
 {
 
-    internal class FonctionResolver<TEntities> : IFunctionResolver<TEntities> where TEntities : ISuggerableModel
+    internal class FonctionResolver<TEntity> : IFunctionResolver<TEntity> where TEntity : ISuggerableModel
     {
 
 
-        public FonctionResolver(RuleRepository<TEntities> ruleRepository)
+        public FonctionResolver(RuleRepository<TEntity> ruleRepository)
         {
             this.ruleRepository = ruleRepository;
         }
 
-        public Func<TEntities, bool> Filter { get; set; }
+        public Func<TEntity, bool> Filter { get; set; }
 
         public int MaxDistance { get; set; }
 
@@ -24,7 +25,7 @@ namespace Bb.Suggestion.Service
             
         }
 
-        private RuleRepository<TEntities> ruleRepository;
+        private RuleRepository<TEntity> ruleRepository;
 
     }
 

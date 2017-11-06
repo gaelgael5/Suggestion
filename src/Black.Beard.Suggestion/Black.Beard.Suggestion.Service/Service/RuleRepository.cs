@@ -1,7 +1,6 @@
 ﻿using Bb.Sdk.ComponentModel;
 using Bb.Sdk.Expressions;
-using Bb.Sdk.Factories;
-using Bb.Suggestion.Models;
+using Bb.Specifications;
 using Bb.Suggestion.Sdk.Attributes;
 using System;
 using System.Collections.Generic;
@@ -13,8 +12,8 @@ using System.Text;
 namespace Bb.Suggestion.Service
 {
 
-    public class RuleRepository<TEntities> : IRuleRepository
-        where TEntities : ISuggerableModel
+    public class RuleRepository<TEntity> : IRuleRepository
+        where TEntity : ISuggerableModel
     {
 
         /// <summary>
@@ -34,7 +33,7 @@ namespace Bb.Suggestion.Service
         public RuleRepository(PerformanceDiagnosticExpression diagnostics, params string[] pluginsPaths)
         {
             this.comparer = new RuleInfoEqualityComparer();
-            this._rules = new HashSet<RuleInfo<TEntities>>(1000, this.comparer);
+            this._rules = new HashSet<RuleInfo<TEntity>>(1000, this.comparer);
             this.typeRepository = new TypeDiscovery(pluginsPaths);
             this.diagnostics = diagnostics ?? new PerformanceDiagnosticExpression();
         }
@@ -52,11 +51,11 @@ namespace Bb.Suggestion.Service
 
             if (assemblies.Length == 0)
             {
-                types = this.typeRepository.Resolve(typeof(ISpecification<TEntities>));
+                types = this.typeRepository.Resolve(typeof(ISpecification<TEntity>));
             }
             else
             {
-                types = this.typeRepository.Resolve(typeof(ISpecification<TEntities>), assemblies);
+                types = this.typeRepository.Resolve(typeof(ISpecification<TEntity>), assemblies);
             }
 
             foreach (var type in types)
@@ -77,7 +76,7 @@ namespace Bb.Suggestion.Service
 
             int count = 0;
 
-            if (!typeof(ISpecification<TEntities>).IsAssignableFrom(type))
+            if (!typeof(ISpecification<TEntity>).IsAssignableFrom(type))
                 throw new Exception();
 
             var items = type.GetConstructors(BindingFlags.Instance | BindingFlags.Public);
@@ -85,7 +84,7 @@ namespace Bb.Suggestion.Service
             foreach (ConstructorInfo method in items)
             {
                 RuleNameAttribute attribute = Attribute.GetCustomAttribute(method, typeof(RuleNameAttribute)) as RuleNameAttribute;
-                if (this._rules.Add(new RuleInfo<TEntities>(attribute.Name, type, method)))
+                if (this._rules.Add(new RuleInfo<TEntity>(attribute.Name, type, method)))
                 {
                     count++;
                     this._lookup = null;
@@ -96,7 +95,7 @@ namespace Bb.Suggestion.Service
 
         }
 
-        public RuleInfo<TEntities> Resolve(string name, Type[] types)
+        public RuleInfo<TEntity> Resolve(string name, Type[] types)
         {
 
             if (this._lookup == null)
@@ -167,10 +166,10 @@ namespace Bb.Suggestion.Service
         public PerformanceDiagnosticExpression Diagnostic { get { return this.diagnostics; } }
 
         private readonly RuleInfoEqualityComparer comparer;
-        private readonly HashSet<RuleInfo<TEntities>> _rules;
+        private readonly HashSet<RuleInfo<TEntity>> _rules;
         private TypeDiscovery typeRepository;
         private readonly PerformanceDiagnosticExpression diagnostics;
-        private ILookup<string, RuleInfo<TEntities>> _lookup;
+        private ILookup<string, RuleInfo<TEntity>> _lookup;
     }
 
 }

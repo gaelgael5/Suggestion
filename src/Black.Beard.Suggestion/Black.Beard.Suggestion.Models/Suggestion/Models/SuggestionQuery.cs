@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Bb.Specifications;
+using System;
+using System.Collections.Generic;
 
 namespace Bb.Suggestion.Models
 {
@@ -6,9 +8,15 @@ namespace Bb.Suggestion.Models
     public abstract class SuggestionQuery
     {
 
-        public string Source { get; set; }
+        public SuggestionQuery()
+        {
+            this.Parameters = new List<SuggestionQueryParameter>();
+        }
 
-        public abstract void Initialize<TEntities>() where TEntities : ISuggerableModel;
+        public string Source { get; set; }
+        
+        public List<SuggestionQueryParameter> Parameters { get; set; }        
+
 
     }
 

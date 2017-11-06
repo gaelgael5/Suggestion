@@ -1,0 +1,13 @@
+C:\github\Suggestion\src\Black.Beard.Suggestion\Black.Beard.Suggestion.Parser\bin\Debug\netcoreapp2.0\Black.Beard.Suggestion.Parser.deps.json
+C:\github\Suggestion\src\Black.Beard.Suggestion\Black.Beard.Suggestion.Parser\bin\Debug\netcoreapp2.0\Black.Beard.Suggestion.Parser.dll
+C:\github\Suggestion\src\Black.Beard.Suggestion\Black.Beard.Suggestion.Parser\bin\Debug\netcoreapp2.0\Black.Beard.Suggestion.Parser.pdb
+C:\github\Suggestion\src\Black.Beard.Suggestion\Black.Beard.Suggestion.Parser\bin\Debug\netcoreapp2.0\Black.Beard.Sdk.dll
+C:\github\Suggestion\src\Black.Beard.Suggestion\Black.Beard.Suggestion.Parser\bin\Debug\netcoreapp2.0\Black.Beard.Suggestion.Models.dll
+C:\github\Suggestion\src\Black.Beard.Suggestion\Black.Beard.Suggestion.Parser\bin\Debug\netcoreapp2.0\Black.Beard.Suggestion.Models.pdb
+C:\github\Suggestion\src\Black.Beard.Suggestion\Black.Beard.Suggestion.Parser\bin\Debug\netcoreapp2.0\Black.Beard.Sdk.pdb
+C:\github\Suggestion\src\Black.Beard.Suggestion\Black.Beard.Suggestion.Parser\obj\Debug\netcoreapp2.0\Black.Beard.Suggestion.Parser.csprojResolveAssemblyReference.cache
+C:\github\Suggestion\src\Black.Beard.Suggestion\Black.Beard.Suggestion.Parser\obj\Debug\netcoreapp2.0\Black.Beard.Suggestion.Parser.csproj.CoreCompileInputs.cache
+C:\github\Suggestion\src\Black.Beard.Suggestion\Black.Beard.Suggestion.Parser\obj\Debug\netcoreapp2.0\Black.Beard.Suggestion.Parser.AssemblyInfoInputs.cache
+C:\github\Suggestion\src\Black.Beard.Suggestion\Black.Beard.Suggestion.Parser\obj\Debug\netcoreapp2.0\Black.Beard.Suggestion.Parser.AssemblyInfo.cs
+C:\github\Suggestion\src\Black.Beard.Suggestion\Black.Beard.Suggestion.Parser\obj\Debug\netcoreapp2.0\Black.Beard.Suggestion.Parser.dll
+C:\github\Suggestion\src\Black.Beard.Suggestion\Black.Beard.Suggestion.Parser\obj\Debug\netcoreapp2.0\Black.Beard.Suggestion.Parser.pdb

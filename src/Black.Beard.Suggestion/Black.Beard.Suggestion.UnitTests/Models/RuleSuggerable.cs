@@ -8,7 +8,7 @@ using Bb.Suggestion.Sdk.Attributes;
 namespace Black.Beard.Suggestion.UnitTests.Models
 {
 
-    public class RuleSuggerable : Specification<Site>
+    public class RuleSuggerable : ExpressionSpecification<Site>
     {
         
         [RuleName("Suggerable")]

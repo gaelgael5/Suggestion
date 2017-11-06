@@ -15,6 +15,9 @@ namespace Bb.Expressions
             switch (e)
             {
 
+                case ParameterExpression c:
+                    return c;
+
                 case MemberExpression c:
                     if (c.Type == typeof(object))
                         return Expression.Lambda<Func<object>>(c).Compile();

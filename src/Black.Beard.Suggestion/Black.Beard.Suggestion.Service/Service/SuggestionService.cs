@@ -1,4 +1,5 @@
 ﻿using Bb.Sdk;
+using Bb.Specifications;
 using Bb.Suggestion.Models;
 using System;
 using System.Collections.Generic;

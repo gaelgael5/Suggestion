@@ -1,4 +1,5 @@
-﻿using Bb.Suggestion.Models;
+﻿using Bb.Specifications;
+using Bb.Suggestion.Models;
 using System;
 
 namespace Bb.Suggestion.Service

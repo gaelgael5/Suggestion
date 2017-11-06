@@ -1,0 +1,15 @@
+C:\github\Suggestion\src\Black.Beard.Suggestion\Black.Beard.Suggestion.Service\bin\Debug\netcoreapp2.0\Black.Beard.Suggestion.Service.deps.json
+C:\github\Suggestion\src\Black.Beard.Suggestion\Black.Beard.Suggestion.Service\bin\Debug\netcoreapp2.0\Black.Beard.Suggestion.Service.dll
+C:\github\Suggestion\src\Black.Beard.Suggestion\Black.Beard.Suggestion.Service\bin\Debug\netcoreapp2.0\Black.Beard.Suggestion.Service.pdb
+C:\github\Suggestion\src\Black.Beard.Suggestion\Black.Beard.Suggestion.Service\bin\Debug\netcoreapp2.0\Black.Beard.Sdk.dll
+C:\github\Suggestion\src\Black.Beard.Suggestion\Black.Beard.Suggestion.Service\bin\Debug\netcoreapp2.0\Black.Beard.Suggestion.Models.dll
+C:\github\Suggestion\src\Black.Beard.Suggestion\Black.Beard.Suggestion.Service\bin\Debug\netcoreapp2.0\Black.Beard.Suggestion.Parser.dll
+C:\github\Suggestion\src\Black.Beard.Suggestion\Black.Beard.Suggestion.Service\bin\Debug\netcoreapp2.0\Black.Beard.Suggestion.Models.pdb
+C:\github\Suggestion\src\Black.Beard.Suggestion\Black.Beard.Suggestion.Service\bin\Debug\netcoreapp2.0\Black.Beard.Suggestion.Parser.pdb
+C:\github\Suggestion\src\Black.Beard.Suggestion\Black.Beard.Suggestion.Service\bin\Debug\netcoreapp2.0\Black.Beard.Sdk.pdb
+C:\github\Suggestion\src\Black.Beard.Suggestion\Black.Beard.Suggestion.Service\obj\Debug\netcoreapp2.0\Black.Beard.Suggestion.Service.csprojResolveAssemblyReference.cache
+C:\github\Suggestion\src\Black.Beard.Suggestion\Black.Beard.Suggestion.Service\obj\Debug\netcoreapp2.0\Black.Beard.Suggestion.Service.csproj.CoreCompileInputs.cache
+C:\github\Suggestion\src\Black.Beard.Suggestion\Black.Beard.Suggestion.Service\obj\Debug\netcoreapp2.0\Black.Beard.Suggestion.Service.AssemblyInfoInputs.cache
+C:\github\Suggestion\src\Black.Beard.Suggestion\Black.Beard.Suggestion.Service\obj\Debug\netcoreapp2.0\Black.Beard.Suggestion.Service.AssemblyInfo.cs
+C:\github\Suggestion\src\Black.Beard.Suggestion\Black.Beard.Suggestion.Service\obj\Debug\netcoreapp2.0\Black.Beard.Suggestion.Service.dll
+C:\github\Suggestion\src\Black.Beard.Suggestion\Black.Beard.Suggestion.Service\obj\Debug\netcoreapp2.0\Black.Beard.Suggestion.Service.pdb

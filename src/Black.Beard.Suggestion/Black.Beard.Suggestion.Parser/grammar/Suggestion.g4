@@ -18,8 +18,7 @@ K_ALL: A L L;
 DIGIT: [0-9];
 
 IDENTIFIER
-    : '{' [a-zA-Z_] [a-zA-Z_0-9]* '}'
-    | [a-zA-Z_] [a-zA-Z_0-9]*
+    : [a-zA-Z_] [a-zA-Z_0-9]*
  ;
 
 COMMENT_INPUT
@@ -27,7 +26,7 @@ COMMENT_INPUT
 
 LINE_COMMENT:
     (
-        ('-- ' | '#') ~[\r\n]* ('\r'? '\n' | EOF) 
+        ( '-- ' | '#') ~[\r\n]* ('\r'? '\n' | EOF) 
         | '--' ('\r'? '\n' | EOF) 
     ) -> channel(HIDDEN);
 
@@ -114,14 +113,14 @@ constant
 ;
 
 variable
-: '$' IDENTIFIER
+: '@' IDENTIFIER
 ;
 
-char_literal
+Char_literal
     : '\'' ( ~'\'' | '\'\'' ) '\''
  ;
 
-string_literal
+String_literal
     : '"' ( ~'"' | '""' )* '"'
 ;
 
@@ -142,24 +141,12 @@ binary_operator
     : AND | OR | ANDALSO | XOR
 ;
 
-numeric_binary_operator
-    : '+' | '-' | '/'  | '*'  | '^' | '%'
-;
-
-boolean_binary_operator
-    : '<' | '>' | '=' | '<=' | '>=' | '<<' | '>>'
-;
-
 unary_operator 
     : NOT
 ;
 
 expr
-    : numeric_literal_expr
-    | string_literal_expr
-    | char_literal
-    | constant
-    | variable
+    : literal
     | array_expr
     | bind_parameter
     | sub_expr
@@ -179,51 +166,38 @@ unary_operator_expr
 array_expr
     : '[' literal? ( ',' literal )* ']'
 ;
-numeric_literal_expr
-    : numeric_literal
-    | numeric_literal numeric_binary_operator numeric_literal
-;
 
 literal
     : numeric_literal
-    | string_literal
-    | char_literal
+    | string_literal_expr
+    | char_literal_expr
     | datetime_expr
     | constant
     | variable
 ;
 
-string_literal_expr
-    : string_literal
-    | string_literal ( '+' string_literal )?
-;
- 
- function_name
- : any_name
+function_name
+    : any_name
  ;
 
- any_name
- : IDENTIFIER 
+any_name
+    : IDENTIFIER 
  ;
+
+string_literal_expr 
+    : String_literal
+;
+
+char_literal_expr
+    : Char_literal
+;
 
 datetime_expr
-    : date_expr + time_expr? string_literal?
-    | time_expr
+    : Datetime String_literal?
 ;
 
-date_expr
-    : date_sub_expr (date_sep date_sub_expr)* string_literal?
-;
-
-time_expr
-    : DIGIT DIGIT ':' DIGIT DIGIT ':' DIGIT DIGIT '.' DIGIT DIGIT*
-;
-date_sub_expr
-    : DIGIT DIGIT*
-;
-
-date_sep
-    : '\\' | '-' '//'
+Datetime
+    : '/' ~'/'* '/'
 ;
 
 fragment A: [aA];

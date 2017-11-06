@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Bb.Specifications;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
 namespace Bb.Suggestion.Service

@@ -5,6 +5,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Bb.Specifications;
+using System.Linq.Expressions;
 
 namespace Black.Beard.Suggestion.UnitTests
 {
@@ -71,12 +73,29 @@ namespace Black.Beard.Suggestion.UnitTests
             SpecificationFactory<Site> _factory = new SpecificationFactory<Site>(repository2, repository1);
             var a = repository2.ResolveRuleType(typeof(RuleSuggerable).Assembly);
 
-            var specification = _factory.Get("Suggerable", new object[] { });
-
-            Assert.IsTrue(specification != null);
+            var specification = Create(_factory, "Suggerable", new object[] { });
 
         }
 
+        private ISpecification<Site> Create(SpecificationFactory<Site> _factory, string ruleName, object[] args)
+        {
+
+            Type[] types = new Type[args.Length];
+
+            for (int i = 0; i < args.Length; i++)
+            {
+                object value = args[i];
+                Type type = value?.GetType();
+                types[i] = type;
+            }
+
+            var rule = _factory.ResolveRule(ruleName, types);
+
+            var creator = _factory.Get(rule, new Expression[args.Length]);
+
+            return creator(args);
+
+        }
 
         [TestMethod]
         public void EvaluateDiscoveryResolverAndActivateWithArguments()
@@ -86,7 +105,7 @@ namespace Black.Beard.Suggestion.UnitTests
             SpecificationFactory<Site> _factory = new SpecificationFactory<Site>(repository2, repository1);
             var a = repository2.ResolveRuleType(typeof(RuleSuggerable).Assembly);
 
-            var specification = _factory.Get("InIndex", new object[] { new int[] { 1, 2, 3 } });
+            var specification = Create(_factory, "InIndex", new object[] { new int[] { 1, 2, 3 } });
 
             Assert.IsTrue(specification != null);
 
@@ -107,8 +126,8 @@ namespace Black.Beard.Suggestion.UnitTests
 
             var site = new Site() { Key = 4, IsSuggrable = true };
 
-            _factory.Get("Suggerable", new object[] { }).IsSatisfiedBy(site);
-            _factory.Get("InIndex", new object[] { new int[] { 1, 2, 3 } }).IsSatisfiedBy(site);
+            Create(_factory, "Suggerable", new object[] { }).IsSatisfiedBy(site);
+            Create(_factory, "InIndex", new object[] { new int[] { 1, 2, 3 } }).IsSatisfiedBy(site);
 
             var d1 = diag.Get(typeof(RuleSuggerable)).Items.First();
             var d2 = diag.Get(typeof(RuleIndex)).Items.First();
@@ -132,7 +151,7 @@ namespace Black.Beard.Suggestion.UnitTests
 
             var site = new Site() { Key = 4, IsSuggrable = true };
 
-            var specification = _factory.Get("Suggerable", new object[] { });
+            var specification = Create(_factory, "Suggerable", new object[] { });
 
             for (int i = 0; i < 10; i++)
                 specification.IsSatisfiedBy(site);
@@ -157,7 +176,7 @@ namespace Black.Beard.Suggestion.UnitTests
 
             var site = new Site() { Key = 4, IsSuggrable = true };
 
-            var specification = _factory.Get("Suggerable", new object[] { });
+            var specification = Create(_factory, "Suggerable", new object[] { });
 
             for (int i = 0; i < 200; i++)
                 specification.IsSatisfiedBy(site);

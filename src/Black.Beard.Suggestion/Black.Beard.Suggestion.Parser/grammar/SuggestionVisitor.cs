@@ -129,18 +129,6 @@ public interface ISuggestionVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitVariable([NotNull] SuggestionParser.VariableContext context);
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="SuggestionParser.char_literal"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitChar_literal([NotNull] SuggestionParser.Char_literalContext context);
-	/// <summary>
-	/// Visit a parse tree produced by <see cref="SuggestionParser.string_literal"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitString_literal([NotNull] SuggestionParser.String_literalContext context);
-	/// <summary>
 	/// Visit a parse tree produced by <see cref="SuggestionParser.numeric_literal"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
@@ -164,18 +152,6 @@ public interface ISuggestionVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitBinary_operator([NotNull] SuggestionParser.Binary_operatorContext context);
-	/// <summary>
-	/// Visit a parse tree produced by <see cref="SuggestionParser.numeric_binary_operator"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitNumeric_binary_operator([NotNull] SuggestionParser.Numeric_binary_operatorContext context);
-	/// <summary>
-	/// Visit a parse tree produced by <see cref="SuggestionParser.boolean_binary_operator"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitBoolean_binary_operator([NotNull] SuggestionParser.Boolean_binary_operatorContext context);
 	/// <summary>
 	/// Visit a parse tree produced by <see cref="SuggestionParser.unary_operator"/>.
 	/// </summary>
@@ -207,23 +183,11 @@ public interface ISuggestionVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitArray_expr([NotNull] SuggestionParser.Array_exprContext context);
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="SuggestionParser.numeric_literal_expr"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitNumeric_literal_expr([NotNull] SuggestionParser.Numeric_literal_exprContext context);
-	/// <summary>
 	/// Visit a parse tree produced by <see cref="SuggestionParser.literal"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitLiteral([NotNull] SuggestionParser.LiteralContext context);
-	/// <summary>
-	/// Visit a parse tree produced by <see cref="SuggestionParser.string_literal_expr"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitString_literal_expr([NotNull] SuggestionParser.String_literal_exprContext context);
 	/// <summary>
 	/// Visit a parse tree produced by <see cref="SuggestionParser.function_name"/>.
 	/// </summary>
@@ -237,34 +201,22 @@ public interface ISuggestionVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitAny_name([NotNull] SuggestionParser.Any_nameContext context);
 	/// <summary>
+	/// Visit a parse tree produced by <see cref="SuggestionParser.string_literal_expr"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitString_literal_expr([NotNull] SuggestionParser.String_literal_exprContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="SuggestionParser.char_literal_expr"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitChar_literal_expr([NotNull] SuggestionParser.Char_literal_exprContext context);
+	/// <summary>
 	/// Visit a parse tree produced by <see cref="SuggestionParser.datetime_expr"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitDatetime_expr([NotNull] SuggestionParser.Datetime_exprContext context);
-	/// <summary>
-	/// Visit a parse tree produced by <see cref="SuggestionParser.date_expr"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitDate_expr([NotNull] SuggestionParser.Date_exprContext context);
-	/// <summary>
-	/// Visit a parse tree produced by <see cref="SuggestionParser.time_expr"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitTime_expr([NotNull] SuggestionParser.Time_exprContext context);
-	/// <summary>
-	/// Visit a parse tree produced by <see cref="SuggestionParser.date_sub_expr"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitDate_sub_expr([NotNull] SuggestionParser.Date_sub_exprContext context);
-	/// <summary>
-	/// Visit a parse tree produced by <see cref="SuggestionParser.date_sep"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitDate_sep([NotNull] SuggestionParser.Date_sepContext context);
 }
 } // namespace Bb.Suggestion.SuggestionParser

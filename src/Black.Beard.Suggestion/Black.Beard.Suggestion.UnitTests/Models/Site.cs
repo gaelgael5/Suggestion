@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using Bb.Suggestion.Service;
 using Bb.Sdk.QuadTreeSorter;
+using Bb.Specifications;
 
 namespace Black.Beard.Suggestion.UnitTests.Models
 {

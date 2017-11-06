@@ -8,7 +8,7 @@ using System.Linq.Expressions;
 namespace Black.Beard.Suggestion.UnitTests.Models
 {
 
-    public class RuleIndex : Specification<Site>
+    public class RuleIndex : ExpressionSpecification<Site>
     {
 
         [RuleName("InIndex")]

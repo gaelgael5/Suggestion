@@ -8,7 +8,7 @@ using System.Linq.Expressions;
 namespace Black.Beard.Suggestion.UnitTests.Models
 {
 
-    public class MatchChar : Specification<Site>
+    public class MatchChar : ExpressionSpecification<Site>
     {
 
         [RuleName("MatchChar")]
