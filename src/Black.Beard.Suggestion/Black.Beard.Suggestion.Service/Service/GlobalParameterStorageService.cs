@@ -121,8 +121,14 @@ namespace Bb.Service
                 }
                 catch (Exception e)
                 {
-
-                    throw;
+                    return new GlobalParameter()
+                    {
+                        Name = Path.GetFileNameWithoutExtension(file.Name),
+                        Exception = e,
+                        LastUpdate = DateTime.UtcNow,
+                        Type = null,
+                        Value = null,
+                    };
                 }
 
             }

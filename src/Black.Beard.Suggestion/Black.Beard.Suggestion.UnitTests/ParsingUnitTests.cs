@@ -305,9 +305,12 @@ namespace Black.Beard.Suggestion.UnitTests
             DEL @toto1;
             SET @toto1 = ""aa"";
             SET @toto2 = ""bb"";
+            SHOW PARAMETERS;
 ");
 
-            if (GetQuery(@"SHOW PARAMETERS").FirstOrDefault() is ShowSuggestionQuery q)
+            Assert.AreEqual(result.Count, 5);
+
+            if (result.Last() is ShowSuggestionQuery q)
             {
                 if (q.Datas is List<GlobalParameter> r)
                     Assert.AreEqual(r.FirstOrDefault().Value, "aa");
@@ -316,8 +319,6 @@ namespace Black.Beard.Suggestion.UnitTests
             }
 
         }
-
-
 
 
 
@@ -343,7 +344,7 @@ namespace Black.Beard.Suggestion.UnitTests
 
             var clock = new SystemClock();
             var cache = new RuntimeLocalCache(new MemoryCache(new MemoryCacheOptions() { Clock = clock, }));
-            GlobalParameterStorageService storageService = new GlobalParameterStorageService(Path.GetTempPath());
+            GlobalParameterStorageService storageService = new GlobalParameterStorageService(Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString()));
 
             RuleRepository<Site> repository1 = new RuleRepository<Site>();
             ConstantRepository repository2 = new ConstantRepository();

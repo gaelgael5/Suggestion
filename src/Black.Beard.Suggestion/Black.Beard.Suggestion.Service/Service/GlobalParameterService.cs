@@ -81,6 +81,8 @@ namespace Bb.Service
             var result = this.Get(name);
             if (result == null)
                 throw new MissingMemberException($"global parameter {name} not found");
+            if (result.Exception != null)
+                throw new Exception($"the variable '{name}' can't be read. try to set the value", result.Exception);
             return result.Value;
         }
 
@@ -114,7 +116,8 @@ namespace Bb.Service
         /// <returns></returns>
         public Expression GetVariableExpression(string name)
         {
-            return Get(name).GetVariableExpression(_methodGet, this._constant);
+            var v = Get(name);            
+            return v.GetVariableExpression(_methodGet, this._constant);
         }
 
         private readonly GlobalParameterStorageService _storageService;

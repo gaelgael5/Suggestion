@@ -19,6 +19,7 @@ namespace Bb.Sdk
         public DateTime LastUpdate { get; set; }
 
         public Type Type { get; set; }
+        public Exception Exception { get; set; }
 
         public Expression GetVariableExpression(MethodInfo method, Expression instance)
         {
