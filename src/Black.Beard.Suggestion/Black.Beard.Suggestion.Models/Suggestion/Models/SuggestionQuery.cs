@@ -10,13 +10,10 @@ namespace Bb.Suggestion.Models
 
         public SuggestionQuery()
         {
-            this.Parameters = new List<SuggestionQueryParameter>();
+
         }
 
         public string Source { get; set; }
-        
-        public List<SuggestionQueryParameter> Parameters { get; set; }        
-
 
     }
 

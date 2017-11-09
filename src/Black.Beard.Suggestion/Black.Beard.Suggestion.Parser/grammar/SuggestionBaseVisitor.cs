@@ -55,7 +55,7 @@ public partial class SuggestionBaseVisitor<Result> : AbstractParseTreeVisitor<Re
 	/// <return>The visitor result.</return>
 	public virtual Result VisitStmt_line([NotNull] SuggestionParser.Stmt_lineContext context) { return VisitChildren(context); }
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="SuggestionParser.stmt_show_methods"/>.
+	/// Visit a parse tree produced by <see cref="SuggestionParser.stmt_show"/>.
 	/// <para>
 	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
 	/// on <paramref name="context"/>.
@@ -63,7 +63,7 @@ public partial class SuggestionBaseVisitor<Result> : AbstractParseTreeVisitor<Re
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	public virtual Result VisitStmt_show_methods([NotNull] SuggestionParser.Stmt_show_methodsContext context) { return VisitChildren(context); }
+	public virtual Result VisitStmt_show([NotNull] SuggestionParser.Stmt_showContext context) { return VisitChildren(context); }
 	/// <summary>
 	/// Visit a parse tree produced by <see cref="SuggestionParser.stmt_Set_globalParameter"/>.
 	/// <para>
@@ -75,7 +75,7 @@ public partial class SuggestionBaseVisitor<Result> : AbstractParseTreeVisitor<Re
 	/// <return>The visitor result.</return>
 	public virtual Result VisitStmt_Set_globalParameter([NotNull] SuggestionParser.Stmt_Set_globalParameterContext context) { return VisitChildren(context); }
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="SuggestionParser.stmt_Get_globalParameter"/>.
+	/// Visit a parse tree produced by <see cref="SuggestionParser.stmt_Set_globalParameter_literal"/>.
 	/// <para>
 	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
 	/// on <paramref name="context"/>.
@@ -83,7 +83,7 @@ public partial class SuggestionBaseVisitor<Result> : AbstractParseTreeVisitor<Re
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	public virtual Result VisitStmt_Get_globalParameter([NotNull] SuggestionParser.Stmt_Get_globalParameterContext context) { return VisitChildren(context); }
+	public virtual Result VisitStmt_Set_globalParameter_literal([NotNull] SuggestionParser.Stmt_Set_globalParameter_literalContext context) { return VisitChildren(context); }
 	/// <summary>
 	/// Visit a parse tree produced by <see cref="SuggestionParser.stmt_Del_globalParameter"/>.
 	/// <para>
@@ -344,5 +344,25 @@ public partial class SuggestionBaseVisitor<Result> : AbstractParseTreeVisitor<Re
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	public virtual Result VisitDatetime_expr([NotNull] SuggestionParser.Datetime_exprContext context) { return VisitChildren(context); }
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="SuggestionParser.datetime_mask"/>.
+	/// <para>
+	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
+	/// on <paramref name="context"/>.
+	/// </para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	public virtual Result VisitDatetime_mask([NotNull] SuggestionParser.Datetime_maskContext context) { return VisitChildren(context); }
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="SuggestionParser.datetime_culture"/>.
+	/// <para>
+	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
+	/// on <paramref name="context"/>.
+	/// </para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	public virtual Result VisitDatetime_culture([NotNull] SuggestionParser.Datetime_cultureContext context) { return VisitChildren(context); }
 }
 } // namespace Bb.Suggestion.SuggestionParser

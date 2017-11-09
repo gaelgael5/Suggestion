@@ -4,7 +4,9 @@ using Bb.Specifications;
 using Bb.Suggestion.Models;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
+using static Bb.Suggestion.SuggestionParser.SuggestionParser;
 
 namespace Bb.Suggestion.SuggestionParser
 {
@@ -18,18 +20,16 @@ namespace Bb.Suggestion.SuggestionParser
         public QueryParser(QueryContext<TEntity> context)
         {
             this._context = context;
-            //var grammar = new SuggestionGrammar();
-            //this.parser = new Parser(grammar);
-            this.Exceptions = new List<Exception>();            
+            this.Exceptions = new List<Exception>();
         }
 
-        public SuggestionQuery Parse(string sourceText)
+        public IEnumerable<SuggestionQuery> Parse(string sourceText)
         {
 
             if (sourceText == null)
                 throw new ArgumentNullException(nameof(sourceText));
 
-            SuggestionQuery result = null;
+            Stmt_listContext context = null;
 
             try
             {
@@ -38,14 +38,7 @@ namespace Bb.Suggestion.SuggestionParser
                 var lexer = new SuggestionLexer(stream);
                 var token = new CommonTokenStream(lexer);
                 var parser = new SuggestionParser(token) { BuildParseTree = true };
-                var context = parser.stmt_list();
-                
-                foreach (IParseTree ast in context.children)
-                {
-                    SelectVisitor<TEntity> visitor = new SelectVisitor<TEntity>(this._context);
-                    visitor.Visit(ast);
-                    result = visitor.Result;
-                }
+                context = parser.stmt_list();
 
             }
             catch (Exception e)
@@ -55,15 +48,45 @@ namespace Bb.Suggestion.SuggestionParser
                 throw;
             }
 
-            if (result != null)
-                result.Source = sourceText;
+            foreach (IParseTree ast in context.children)
+            {
 
-            return result;
-   
+                SuggestionQuery result = null;
+                SelectVisitor<TEntity> visitor = new SelectVisitor<TEntity>(this._context);
+
+                try
+                {
+                    visitor.Visit(ast);
+                    result = visitor.Result;
+                }
+                catch (Exception e)
+                {
+                    if (System.Diagnostics.Debugger.IsAttached)
+                        System.Diagnostics.Debugger.Break();
+                    throw;
+                }
+
+                if (result != null)
+                {
+                    if (ast is ParserRuleContext line)
+                    {
+                        var start = line.Start.StartIndex;
+                        var end = line.Stop.StopIndex;
+                        Debug.Assert(end - start > 0);
+                        result.Source = sourceText.Substring(start, end - start);
+                    }
+                    else
+                        result.Source = sourceText;
+
+                    yield return result;
+                }
+
+            }
+
         }
 
 
-        public  QueryContext<TEntity> Context { get { return this._context; } }
+        public QueryContext<TEntity> Context { get { return this._context; } }
 
         private readonly QueryContext<TEntity> _context;
 

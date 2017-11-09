@@ -6,6 +6,7 @@ using Bb.Suggestion.Models;
 using Bb.Suggestion.Sdk.Attributes;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
@@ -73,8 +74,9 @@ namespace Bb.Suggestion.Service
                 {
 
                     string name = attribute.Name;
+                    DescriptionAttribute _descritpionAttribute = Attribute.GetCustomAttribute(method, typeof(DescriptionAttribute)) as DescriptionAttribute;
 
-                    var b = new box(name, method, instance);
+                    var b = new box(name, method, instance , _descritpionAttribute?.Description ?? string.Empty);
                     if (!this._constants.ContainsKey(name))
                     {
                         this._constants.Add(name, b);
@@ -117,16 +119,20 @@ namespace Bb.Suggestion.Service
 
         private class box
         {
+
             private string name;
-            private MethodInfo method;
+            private readonly MethodInfo method;
             private object instance;
             private readonly Func<Expression> _call;
+            public readonly string description;
 
-            public box(string name, MethodInfo method, object instance)
+            public box(string name, MethodInfo method, object instance, string description)
             {
+
                 this.name = name;
                 this.method = method;
                 this.instance = instance;
+                this.description = description;
 
                 var lbd = Expression.Lambda<Func<Expression>>(Expression.Call(Expression.Constant(instance), method));
 
@@ -139,6 +145,12 @@ namespace Bb.Suggestion.Service
                 return this._call();
             }
 
+        }
+
+        internal IEnumerable<KeyValuePair<string, string>> List()
+        {
+            foreach (var item in this._constants)
+                yield return new KeyValuePair<string, string>(item.Key, item.Value.description);
         }
 
     }

@@ -12,6 +12,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Black.Beard.Suggestion.Models\Black.Beard.Suggestion.Models.csproj" />
     <ProjectReference Include="..\Black.Beard.Suggestion.Parser\Black.Beard.Suggestion.Parser.csproj" />
+    <ProjectReference Include="..\Cache\Black.Beard.Caching.Contracts\Black.Beard.Caching.Contracts.csproj" />
   </ItemGroup>
 
   <ItemGroup>

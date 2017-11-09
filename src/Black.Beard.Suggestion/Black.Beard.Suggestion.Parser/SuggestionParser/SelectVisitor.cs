@@ -10,6 +10,9 @@ using System.Linq.Expressions;
 using System.Globalization;
 using Bb.Specifications.Leafs;
 using System.Reflection;
+using Bb.Exceptions;
+using Bb.Sdk;
+using Bb.Sdk.Expressions;
 
 namespace Bb.Suggestion.SuggestionParser
 {
@@ -18,21 +21,29 @@ namespace Bb.Suggestion.SuggestionParser
          where TEntity : ISuggerableModel
     {
 
+
+        #region ctor
+
         static SelectVisitor()
         {
 
             SelectVisitor<TEntity>.SpecificationLeafAnd = typeof(SpecificationLeafAnd<TEntity>).GetConstructor(new Type[] { typeof(ISpecification<TEntity>), typeof(ISpecification<TEntity>) });
             SelectVisitor<TEntity>.SpecificationLeafOr = typeof(SpecificationLeafOr<TEntity>).GetConstructor(new Type[] { typeof(ISpecification<TEntity>), typeof(ISpecification<TEntity>) });
             SelectVisitor<TEntity>.SpecificationLeafNot = typeof(SpecificationLeafNot<TEntity>).GetConstructor(new Type[] { typeof(ISpecification<TEntity>) });
+            SelectVisitor<TEntity>._comparer = StringComparer.InvariantCultureIgnoreCase;
 
         }
 
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SelectVisitor{TEntity}"/> class.
+        /// </summary>
+        /// <param name="context">The context.</param>
+        /// <exception cref="DuplicateNameException"></exception>
         public SelectVisitor(QueryContext<TEntity> context)
         {
 
             this._context = context;
-            this._result = new SuggestionQuerySelect<TEntity>();
-
             this._dic = new Dictionary<string, _Expression_parameter>();
             this._parameters = new Dictionary<string, QueryParameter>(this._context.Parameters.Count());
             this._usedParameters = new HashSet<QueryParameter>();
@@ -51,6 +62,168 @@ namespace Bb.Suggestion.SuggestionParser
 
         }
 
+        #endregion ctor
+
+        public override Expression VisitStmt_Set_globalParameter([NotNull] SuggestionParser.Stmt_Set_globalParameterContext context)
+        {
+
+            var name = context.any_name();
+            if (name == null)
+                throw new InternalServerException("variable name can't be evaluated can't be evaluated");
+
+            string _name = name.GetText();
+
+            var value = context.stmt_Set_globalParameter_literal();
+            var e = this.Visit(value);
+
+            if (e == null)
+                throw new InternalServerException("value can't be evaluated");
+
+            var c = e as ConstantExpression;
+
+            if (c == null)
+                throw new InternalServerException("value is not a constant");
+
+            this._context.Factory.SetVariable(_name, c.Value);
+
+            ExecutedQuery query = new ExecutedQuery($"global parameter '{_name}' has been setted");
+            this._result = query;
+
+            return null;
+
+        }
+
+        public override Expression VisitStmt_Del_globalParameter([NotNull] SuggestionParser.Stmt_Del_globalParameterContext context)
+        {
+
+            var name = context.any_name();
+            if (name == null)
+                throw new InternalServerException("variable name can't be evaluated can't be evaluated");
+
+            string _name = name.GetText();
+
+            var result = this._context.Factory.DelVariable(_name);
+
+            ExecutedQuery query = new ExecutedQuery(
+                result 
+                    ? $"global parameter '{_name}' has been deleted" 
+                    : $"global parameter '{_name}' was not found"
+            );
+            this._result = query;
+
+            return null;
+
+        }
+
+        public override Expression VisitStmt_show([NotNull] SuggestionParser.Stmt_showContext context)
+        {
+
+            var _name = context.any_name().Select(c => c.GetText()).ToArray();
+            string name = string.Empty;
+
+
+            var result = new ShowSuggestionQuery(_name[0].ToUpper())
+            {
+
+            };
+
+            switch (result.ObjectName)
+            {
+
+                case "METHODS":
+                    result.Datas = this._context.Factory.Rules();
+                    break;
+
+                case "METHOD":
+                    if (_name.Length == 1)
+                        throw new SyntaxErrorException($"SHOW METHOD must to have a method name. for get a complet list of constants, please concidere 'SHOW METHODS'");
+                    name = _name[1];
+                    result.Datas = this._context.Factory.Rules().Where(c => SelectVisitor<TEntity>._comparer.Compare(c.Name, name) == 0).ToList();
+                    break;
+
+                case "CONSTANTS":
+                    result.Datas = this._context.Factory.Constants();
+                    break;
+
+                case "CONSTANT":
+                    if (_name.Length == 1)
+                        throw new SyntaxErrorException($"SHOW CONSTANT must to have a constant name. for get a complet list of constants, please concidere 'SHOW CONSTANTS'");
+                    name = _name[1];
+                    if (!name.StartsWith("$"))
+                        name = "$" + name;
+                    result.Datas = this._context.Factory.Constants().Where(c => SelectVisitor<TEntity>._comparer.Compare(c.Key, name) == 0).ToList();
+                    break;
+
+                case "PARAMETERS":
+                    result.Datas = this._context.Factory.Variables();
+                    break;
+
+                case "PARAMETER":
+                    if (_name.Length == 1)
+                        throw new SyntaxErrorException($"SHOW PARAMETER must to have a global parameter name. for get a complet list of constants, please concidere 'SHOW PARAMETERS'");
+                    name = _name[1];
+                    var data = this._context.Factory.ResolveVariable(name);
+                    if (data != null)
+                        result.Datas = new List<GlobalParameter>() { data };
+                    else
+                        result.Datas = new List<GlobalParameter>() {  };
+                    break;
+
+                default:
+                    throw new SyntaxErrorException($"'{result.ObjectName}' is not recognized type object in 'SHOW' statment.");
+            }
+
+            this._result = result;
+
+            return null;
+
+        }
+
+        public override Expression VisitWhere_stmt([NotNull] SuggestionParser.Where_stmtContext context)
+        {
+
+            var result = base.VisitWhere_stmt(context);
+
+            List<Expression> lst = new List<Expression>();
+            ParameterExpression arg = Expression.Parameter(typeof(object[]), "arg");
+
+            int _index = 0;
+            ParameterExpression[] _pTarget = new ParameterExpression[this._usedParameters.Count];
+            foreach (QueryParameter parameter in this._usedParameters)
+            {
+
+                Expression index = Expression.Constant(_index);
+                _pTarget[_index] = parameter.Expression;
+
+                Expression paramAccessorExp = Expression.ArrayIndex(arg, index);
+                Expression paramCastExp = Expression.Convert(paramAccessorExp, parameter.Expression.Type);
+
+                var u = Expression.Assign(parameter.Expression, paramCastExp);
+
+                lst.Add(u);
+
+                _index++;
+
+            }
+
+            lst.Add(result);
+
+            var blk = Expression.Block(_pTarget, lst.ToArray());
+
+            var lbd = Expression.Lambda<Func<object[], ISpecification<TEntity>>>(blk, arg);
+
+            this._result = new SuggestionQuerySelect<TEntity>()
+            {
+                Where = new SuggestionWhere<TEntity>(lbd.Compile(), this._usedParameters.Select(c => new WhereQueryParameter() { Name = c.Name, Type = c.Expression.Type })),
+            };
+
+            return null;
+
+        }
+
+
+        #region Subs
+        
         public override Expression VisitFunction_stmt([NotNull] SuggestionParser.Function_stmtContext context)
         {
 
@@ -94,67 +267,41 @@ namespace Bb.Suggestion.SuggestionParser
 
         }
 
-        public override Expression VisitWhere_stmt([NotNull] SuggestionParser.Where_stmtContext context)
-        {
-
-            var result = base.VisitWhere_stmt(context);
-
-            List<Expression> lst = new List<Expression>();
-            ParameterExpression arg = Expression.Parameter(typeof(object[]), "arg");
-
-            int _index = 0;
-            ParameterExpression[] _pTarget = new ParameterExpression[this._usedParameters.Count];
-            foreach (QueryParameter parameter in this._usedParameters)
-            {
-                Expression index = Expression.Constant(_index);
-                _pTarget[_index] = parameter.Expression;
-
-                Expression paramAccessorExp = Expression.ArrayIndex(arg, index);
-                Expression paramCastExp = Expression.Convert(paramAccessorExp, parameter.Expression.Type);
-
-                var u = Expression.Assign(parameter.Expression, paramCastExp);
-
-                lst.Add(u);
-
-                _index++;
-            }
-
-            lst.Add(result);
-
-            var blk = Expression.Block(_pTarget, lst.ToArray());
-
-            var lbd = Expression.Lambda<Func<object[], ISpecification<TEntity>>>(blk, arg);
-
-            this._result.Where = lbd.Compile();
-
-            return null;
-
-        }
-
-
         public override Expression VisitDatetime_expr([NotNull] SuggestionParser.Datetime_exprContext context)
         {
 
             string mask = string.Empty;
+            CultureInfo culture = CultureInfo.InvariantCulture;
             string date = context.Datetime().GetText();
+            DateTime dte;
 
             try
             {
 
-                DateTime dte;
                 date = date.Substring(1, date.Length - 2);
-                var _mask = context.String_literal();
+                var _mask = context.datetime_mask();
 
                 if (_mask != null)
                 {
                     mask = _mask.GetText();
                     mask = mask.Substring(1, mask.Length - 2);
-
-                    dte = DateTime.ParseExact(date, mask, CultureInfo.InvariantCulture);
-                    return Expression.Constant(dte);
                 }
 
-                dte = DateTime.Parse(date, CultureInfo.InvariantCulture);
+                var _culture = context.datetime_culture();
+                if (_culture != null)
+                {
+                    string __culture = _culture.GetText();
+                    __culture = __culture.Substring(1, __culture.Length - 2);
+
+                    culture = CultureInfo.GetCultureInfo(__culture);
+                }
+
+                if (string.IsNullOrEmpty(mask))
+                    dte = DateTime.Parse(date, culture);
+
+                else
+                    dte = DateTime.ParseExact(date, mask, culture);
+
                 return Expression.Constant(dte);
 
             }
@@ -163,7 +310,7 @@ namespace Bb.Suggestion.SuggestionParser
                 if (string.IsNullOrEmpty(mask))
                     throw new FormatException($"{date} at position {context.Start.StartIndex} ({context.Start.Line}:{context.Start.Column})");
                 else
-                    throw new FormatException($"{date} -> '{mask}' at position {context.Start.StartIndex} ({context.Start.Line}:{context.Start.Column})");
+                    throw new FormatException($"{date} -> '{mask}' '{culture.Name}' at position {context.Start.StartIndex} ({context.Start.Line}:{context.Start.Column})");
             }
 
         }
@@ -255,6 +402,13 @@ namespace Bb.Suggestion.SuggestionParser
 
         }
 
+        public override Expression VisitVariable([NotNull] SuggestionParser.VariableContext context)
+        {
+            var varName = context.GetText();
+            var e = this._context.Factory.GetVariableExpression(varName);
+            return e;
+        }
+
         public override Expression VisitNumeric_double_literal([NotNull] SuggestionParser.Numeric_double_literalContext context)
         {
             double dbl;
@@ -329,19 +483,24 @@ namespace Bb.Suggestion.SuggestionParser
             return Expression.Constant(t[1]);
         }
 
+        #endregion Subs
 
 
 
 
         public SuggestionQuery Result { get { return this._result; } }
 
+
+        #region private
+
         private readonly QueryContext<TEntity> _context;
-        private readonly SuggestionQuerySelect<TEntity> _result;
+        private SuggestionQuery _result;
         private readonly Dictionary<string, _Expression_parameter> _dic;
         private readonly Dictionary<string, QueryParameter> _parameters;
         private readonly static ConstructorInfo SpecificationLeafAnd;
         private readonly static ConstructorInfo SpecificationLeafOr;
         private readonly static ConstructorInfo SpecificationLeafNot;
+        private static readonly StringComparer _comparer;
         private HashSet<QueryParameter> _usedParameters;
 
         private _Expression_parameter GetParameter(string argName, Expression[] _expression_values, RuleInfo rule)
@@ -377,6 +536,15 @@ namespace Bb.Suggestion.SuggestionParser
                 case NewArrayExpression c:
                     return GetKeyText(c);
 
+                case MethodCallExpression m:
+                    var i = ConstantFinder.Get(m);
+                    if (i != null)
+                        return i;
+                    return m.Method.ToString();
+
+                case UnaryExpression u:
+                    return GetKeyText(u.Operand);
+
                 default:
                     if (System.Diagnostics.Debugger.IsAttached)
                         System.Diagnostics.Debugger.Break();
@@ -386,6 +554,7 @@ namespace Bb.Suggestion.SuggestionParser
             return null;
 
         }
+
 
         private static string GetKeyText(NewArrayExpression c)
         {
@@ -402,6 +571,9 @@ namespace Bb.Suggestion.SuggestionParser
             sb.Append("}");
             return sb.ToString();
         }
+
+        #endregion private
+
 
     }
 }

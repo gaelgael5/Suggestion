@@ -5,7 +5,7 @@ grammar Suggestion;
 
 options
 {
-    // caseSensitive=false;
+
 }
 
 AND: '&';
@@ -15,6 +15,12 @@ XOR: '||';
 NOT: '!';
 
 K_ALL: A L L;
+K_SHOW: S H O W;
+K_WHERE: W H E R E;
+K_WITH : W I T H;
+K_FACETS : F A C E T S;
+K_ORDER : O R D E R;
+K_BY : B Y;
 DIGIT: [0-9];
 
 IDENTIFIER
@@ -40,10 +46,9 @@ stmt_list
  ;
 
 stmt_line
-    : stmt_show_methods
+    : stmt_show
     | select_stmt
-    | stmt_Set_globalParameter
-    | stmt_Get_globalParameter
+    | stmt_Set_globalParameter    
     | stmt_Del_globalParameter
 ;
 
@@ -51,9 +56,8 @@ stmt_line
  ################## Show ################## 
  */
 
-stmt_show_methods
-    : 'SHOW' 'METHODS'
-    | 'SHOW' 'METHOD' function_name
+stmt_show
+    : K_SHOW any_name any_name?
 ;
 
 /*
@@ -61,15 +65,18 @@ stmt_show_methods
  */
 
 stmt_Set_globalParameter
-    : 'SET' IDENTIFIER '=' literal
+    : 'SET' any_name '=' stmt_Set_globalParameter_literal
 ;
 
-stmt_Get_globalParameter
-    : 'GET' IDENTIFIER
+stmt_Set_globalParameter_literal
+    : numeric_literal
+    | string_literal_expr
+    | char_literal_expr
+    | datetime_expr
 ;
 
 stmt_Del_globalParameter
-    : 'DEL' IDENTIFIER
+    : 'DEL' any_name
 ;
 
 /*
@@ -81,15 +88,15 @@ select_stmt
 ;
 
 where_stmt
-    : 'WHERE' (expr | K_ALL)
+    : K_WHERE (expr | K_ALL)
 ;
 
 order_stmt
-    : 'ORDER BY' identifier_stmt
+    : K_ORDER K_BY identifier_stmt
 ;
 
 facet_stmt
-    : 'WITH FACETS' IDENTIFIER ( ',' IDENTIFIER )*
+    : K_WITH K_FACETS IDENTIFIER ( ',' IDENTIFIER )*
 ;
 
 function_stmt
@@ -193,8 +200,17 @@ char_literal_expr
 ;
 
 datetime_expr
-    : Datetime String_literal?
+    : Datetime (datetime_mask datetime_culture?)?
 ;
+
+datetime_mask
+    : String_literal
+;
+
+datetime_culture
+    : String_literal
+;
+
 
 Datetime
     : '/' ~'/'* '/'

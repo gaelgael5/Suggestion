@@ -1,9 +1,0 @@
-C:\github\Suggestion\src\Black.Beard.Suggestion\Black.Beard.Sdk\bin\Debug\netcoreapp2.0\Black.Beard.Sdk.deps.json
-C:\github\Suggestion\src\Black.Beard.Suggestion\Black.Beard.Sdk\bin\Debug\netcoreapp2.0\Black.Beard.Sdk.dll
-C:\github\Suggestion\src\Black.Beard.Suggestion\Black.Beard.Sdk\bin\Debug\netcoreapp2.0\Black.Beard.Sdk.pdb
-C:\github\Suggestion\src\Black.Beard.Suggestion\Black.Beard.Sdk\obj\Debug\netcoreapp2.0\Black.Beard.Sdk.csprojResolveAssemblyReference.cache
-C:\github\Suggestion\src\Black.Beard.Suggestion\Black.Beard.Sdk\obj\Debug\netcoreapp2.0\Black.Beard.Sdk.csproj.CoreCompileInputs.cache
-C:\github\Suggestion\src\Black.Beard.Suggestion\Black.Beard.Sdk\obj\Debug\netcoreapp2.0\Black.Beard.Sdk.AssemblyInfoInputs.cache
-C:\github\Suggestion\src\Black.Beard.Suggestion\Black.Beard.Sdk\obj\Debug\netcoreapp2.0\Black.Beard.Sdk.AssemblyInfo.cs
-C:\github\Suggestion\src\Black.Beard.Suggestion\Black.Beard.Sdk\obj\Debug\netcoreapp2.0\Black.Beard.Sdk.dll
-C:\github\Suggestion\src\Black.Beard.Suggestion\Black.Beard.Sdk\obj\Debug\netcoreapp2.0\Black.Beard.Sdk.pdb

@@ -23,7 +23,7 @@ namespace Bb.Sdk.Expressions
         /// <typeparam name="T"></typeparam>
         /// <param name="self">The self.</param>
         /// <returns></returns>
-        public static dynamic Get<T>(System.Linq.Expressions.Expression<Func<T, bool>> self)
+        public static dynamic Get(Expression self)
         {
             ConstantFinder visitor = new ConstantFinder();
             visitor.Visit(self);
@@ -45,4 +45,5 @@ namespace Bb.Sdk.Expressions
 
 
     }
+
 }

@@ -95,6 +95,15 @@ namespace Bb.Suggestion.Service
 
         }
 
+        /// <summary>
+        /// Lists of ruleInfos
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<RuleInfo<TEntity>> List()
+        {
+            return this._rules;
+        }
+
         public RuleInfo<TEntity> Resolve(string name, Type[] types)
         {
 

@@ -11,7 +11,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Suggestion.Serv
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Suggestion.UnitTests", "Black.Beard.Suggestion.UnitTests\Black.Beard.Suggestion.UnitTests.csproj", "{F62156FA-FD80-42F0-A001-588B8A5ABFFE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Black.Beard.Sdk", "Black.Beard.Sdk\Black.Beard.Sdk.csproj", "{0AE0149A-3FE9-45AB-B283-B86AEE6D36FD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Sdk", "Black.Beard.Sdk\Black.Beard.Sdk.csproj", "{0AE0149A-3FE9-45AB-B283-B86AEE6D36FD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Cache", "Cache", "{792B449C-9774-4F51-9EE3-D45EBB70563B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Caching.Contracts", "Cache\Black.Beard.Caching.Contracts\Black.Beard.Caching.Contracts.csproj", "{DD574A0B-36B7-4D9F-AB59-B921C398C7FE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Caching", "Cache\Black.Beard.Caching\Black.Beard.Caching.csproj", "{31777012-A641-4D59-B62D-AE10BB4F7730}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Caching.Runtime", "Cache\Black.Beard.Caching.Runtime\Black.Beard.Caching.Runtime.csproj", "{4D4A1646-083E-4545-9D22-E8280658E69F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,9 +47,26 @@ Global
 		{0AE0149A-3FE9-45AB-B283-B86AEE6D36FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0AE0149A-3FE9-45AB-B283-B86AEE6D36FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0AE0149A-3FE9-45AB-B283-B86AEE6D36FD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DD574A0B-36B7-4D9F-AB59-B921C398C7FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD574A0B-36B7-4D9F-AB59-B921C398C7FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD574A0B-36B7-4D9F-AB59-B921C398C7FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD574A0B-36B7-4D9F-AB59-B921C398C7FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{31777012-A641-4D59-B62D-AE10BB4F7730}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{31777012-A641-4D59-B62D-AE10BB4F7730}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{31777012-A641-4D59-B62D-AE10BB4F7730}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{31777012-A641-4D59-B62D-AE10BB4F7730}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4D4A1646-083E-4545-9D22-E8280658E69F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D4A1646-083E-4545-9D22-E8280658E69F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D4A1646-083E-4545-9D22-E8280658E69F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D4A1646-083E-4545-9D22-E8280658E69F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{DD574A0B-36B7-4D9F-AB59-B921C398C7FE} = {792B449C-9774-4F51-9EE3-D45EBB70563B}
+		{31777012-A641-4D59-B62D-AE10BB4F7730} = {792B449C-9774-4F51-9EE3-D45EBB70563B}
+		{4D4A1646-083E-4545-9D22-E8280658E69F} = {792B449C-9774-4F51-9EE3-D45EBB70563B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D20672B3-214D-4BF6-BBB3-81BD88A23ADF}

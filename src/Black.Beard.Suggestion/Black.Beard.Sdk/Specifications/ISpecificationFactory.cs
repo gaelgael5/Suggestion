@@ -1,7 +1,8 @@
 ﻿using System;
-using Bb.Sdk.Expressions;
 using System.Linq.Expressions;
-using Bb.Sdk.Factories;
+using System.Collections.Generic;
+using Bb.Sdk;
+using System.Collections;
 
 namespace Bb.Specifications
 {
@@ -33,7 +34,13 @@ namespace Bb.Specifications
         /// <returns></returns>
         RuleInfo ResolveRule(string ruleName, Type[] types);
         
-        ObjectActivator<ISpecification<TEntity>> Get(RuleInfo ruleInfo, Expression[] args1);
+        //ObjectActivator<ISpecification<TEntity>> Get(RuleInfo ruleInfo, Expression[] args1);
+
+        /// <summary>
+        /// Ruleses this instance.
+        /// </summary>
+        /// <returns></returns>
+        IEnumerable<RuleInfo<TEntity>> Rules();
 
         /// <summary>
         /// Return a new expression that resolve constant.
@@ -41,6 +48,19 @@ namespace Bb.Specifications
         /// <param name="constantName">Name of the constant.</param>
         /// <returns><see cref="Expression"/> </returns>
         Expression ResolveConstant(string txt);
+
+        IEnumerable<KeyValuePair<string, string>> Constants();
+
+
+        void SetVariable(string name, object value);
+
+        bool DelVariable(string name);
+
+        IEnumerable<GlobalParameter> Variables();
+
+        GlobalParameter ResolveVariable(string name);
+
+        Expression GetVariableExpression(string name);
 
     }
 }

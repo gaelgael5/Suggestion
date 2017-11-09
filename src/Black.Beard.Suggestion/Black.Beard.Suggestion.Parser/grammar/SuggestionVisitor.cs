@@ -45,11 +45,11 @@ public interface ISuggestionVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitStmt_line([NotNull] SuggestionParser.Stmt_lineContext context);
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="SuggestionParser.stmt_show_methods"/>.
+	/// Visit a parse tree produced by <see cref="SuggestionParser.stmt_show"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	Result VisitStmt_show_methods([NotNull] SuggestionParser.Stmt_show_methodsContext context);
+	Result VisitStmt_show([NotNull] SuggestionParser.Stmt_showContext context);
 	/// <summary>
 	/// Visit a parse tree produced by <see cref="SuggestionParser.stmt_Set_globalParameter"/>.
 	/// </summary>
@@ -57,11 +57,11 @@ public interface ISuggestionVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitStmt_Set_globalParameter([NotNull] SuggestionParser.Stmt_Set_globalParameterContext context);
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="SuggestionParser.stmt_Get_globalParameter"/>.
+	/// Visit a parse tree produced by <see cref="SuggestionParser.stmt_Set_globalParameter_literal"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	Result VisitStmt_Get_globalParameter([NotNull] SuggestionParser.Stmt_Get_globalParameterContext context);
+	Result VisitStmt_Set_globalParameter_literal([NotNull] SuggestionParser.Stmt_Set_globalParameter_literalContext context);
 	/// <summary>
 	/// Visit a parse tree produced by <see cref="SuggestionParser.stmt_Del_globalParameter"/>.
 	/// </summary>
@@ -218,5 +218,17 @@ public interface ISuggestionVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitDatetime_expr([NotNull] SuggestionParser.Datetime_exprContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="SuggestionParser.datetime_mask"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitDatetime_mask([NotNull] SuggestionParser.Datetime_maskContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="SuggestionParser.datetime_culture"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitDatetime_culture([NotNull] SuggestionParser.Datetime_cultureContext context);
 }
 } // namespace Bb.Suggestion.SuggestionParser

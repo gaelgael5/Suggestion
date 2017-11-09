@@ -10,13 +10,19 @@ namespace Bb.Suggestion.Models
          where TEntity : ISuggerableModel
     {
 
+        public SuggestionQuerySelect()
+        {
+            //   this.Parameters = new List<SuggestionQueryParameter>();
+        }
+
+
         public Origin Origin { get; set; }
 
         public IFilterFactory<TEntity> Filter { get; set; }
 
         public string[] Facets { get; set; }
 
-        public Func<object[], ISpecification<TEntity>> Where { get; set; }
+        public SuggestionWhere<TEntity> Where { get; set; }
 
     }
 
